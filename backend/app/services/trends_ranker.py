@@ -2,10 +2,11 @@
 Trends Ranker – 기존 keyword_engine 점수와 Trends 점수를 병합하여 재점수화
 
 final_score =
-  (internal_relevance * 0.45) +
-  (trend_score * 0.35) +
-  (situation_match * 0.10) +
-  (genre_match * 0.10)
+  (trend_score * 0.30) +
+  (internal_relevance * 0.25) +
+  (long_tail_bonus * 0.20) +
+  (low_competition * 0.15) +
+  (intent_match * 0.10)
 """
 
 import logging
@@ -21,6 +22,7 @@ from backend.app.services.keyword_engine import (
     classify_keyword,
     competition_score,
 )
+from backend.app.services.intent_classifier import intent_match_score
 
 logger = logging.getLogger(__name__)
 
@@ -140,12 +142,13 @@ def enhance_with_trends(
         trend_score = trend_kw_map.get(ks.keyword.lower(), 0.0)
         query_type = trend_type_map.get(ks.keyword.lower(), "none")
 
-        # 새 공식: trend + internal + long_tail + low_competition
+        intent_score = intent_match_score(ks.keyword, analysis.primary_situation)
         new_total = (
-            trend_score * 0.35
-            + ks.relevance * 0.30
+            trend_score * 0.30
+            + ks.relevance * 0.25
             + _long_tail_bonus(ks.keyword)
             + _low_competition_bonus(ks.keyword)
+            + intent_score * 0.10
             + _rising_bonus(query_type)
         )
         new_total = max(0.0, min(1.0, new_total))
@@ -169,11 +172,13 @@ def enhance_with_trends(
 
             base_ks = score_keyword(q["keyword"], analysis)
 
+            intent_score_new = intent_match_score(q["keyword"], analysis.primary_situation)
             new_total = (
-                trend_score * 0.35
-                + base_ks.relevance * 0.30
+                trend_score * 0.30
+                + base_ks.relevance * 0.25
                 + _long_tail_bonus(q["keyword"])
                 + _low_competition_bonus(q["keyword"])
+                + intent_score_new * 0.10
                 + _rising_bonus(query_type)
             )
             new_total = max(0.0, min(1.0, new_total))

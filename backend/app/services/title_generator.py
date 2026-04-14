@@ -16,6 +16,7 @@ from backend.app.services.coherence import (
     is_title_consistent,
 )
 from backend.app.services.keyword_engine import classify_keyword
+from backend.app.services.intent_classifier import classify_intent
 
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 _dict_cache: dict | None = None
@@ -203,15 +204,29 @@ def _pick_by_type(
     target_type: str,
     situation: str,
     count: int = 3,
+    preferred_intents: list[str] | None = None,
 ) -> list[str]:
-    """특정 keyword type의 키워드를 점수 순으로 추출."""
-    candidates = [
-        ks for ks in keyword_scores
-        if classify_keyword(ks.keyword) == target_type
-        and is_title_consistent(situation, ks.keyword)
-    ]
-    candidates.sort(key=lambda k: k.total_score, reverse=True)
-    return [c.keyword for c in candidates[:count]]
+    """특정 keyword type + intent의 키워드를 점수 순으로 추출."""
+    candidates = []
+    for ks in keyword_scores:
+        if classify_keyword(ks.keyword) != target_type:
+            continue
+        if not is_title_consistent(situation, ks.keyword):
+            continue
+
+        # intent 보너스 적용
+        score = ks.total_score
+        if preferred_intents:
+            intent = classify_intent(ks.keyword)
+            if intent in preferred_intents:
+                score += 0.1
+            elif intent not in preferred_intents:
+                score -= 0.05
+
+        candidates.append((ks.keyword, score))
+
+    candidates.sort(key=lambda x: x[1], reverse=True)
+    return [kw for kw, _ in candidates[:count]]
 
 
 def _make_title_pair(
@@ -259,10 +274,12 @@ def generate_title_sets(
     genre = _pick_display_keyword(analysis.primary_genre, "genres", language)
     situation = analysis.primary_situation
 
-    # mid-tail 제목 (검색형)
-    mid_kws = _pick_by_type(keyword_scores, "mid-tail", situation, 3)
+    # mid-tail 제목 (검색형: discovery + utility intent)
+    mid_kws = _pick_by_type(
+        keyword_scores, "mid-tail", situation, 3,
+        preferred_intents=["discovery", "utility"],
+    )
     if not mid_kws:
-        # fallback: non-head 키워드
         non_head = [
             ks for ks in sorted(keyword_scores, key=lambda k: k.total_score, reverse=True)
             if classify_keyword(ks.keyword) != "head"
@@ -271,8 +288,11 @@ def generate_title_sets(
         mid_kws = [k.keyword for k in non_head[:3]]
     mid_ytm, mid_ytp = _make_title_pair(mid_kws, genre, language, situation)
 
-    # long-tail 제목 (롱테일형)
-    long_kws = _pick_by_type(keyword_scores, "long-tail", situation, 3)
+    # long-tail 제목 (롱테일형: utility + creator intent)
+    long_kws = _pick_by_type(
+        keyword_scores, "long-tail", situation, 3,
+        preferred_intents=["utility", "creator"],
+    )
     if not long_kws:
         all_sorted = sorted(keyword_scores, key=lambda k: len(k.keyword), reverse=True)
         long_kws = [
