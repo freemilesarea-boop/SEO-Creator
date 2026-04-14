@@ -131,6 +131,22 @@ class ThumbnailSuggestion(BaseModel):
     text_overlay: str = Field(description="텍스트 오버레이 문구")
 
 
+class TitleExplanation(BaseModel):
+    """제목 하나에 대한 SEO 설명"""
+    title: str = ""
+    keyword_type: str = ""
+    intent: str = ""
+    competition: str = ""
+    fragments: list[dict] = Field(default_factory=list)
+    summary: str = ""
+
+
+class ResultSetExplanation(BaseModel):
+    """결과 세트의 설명"""
+    yt_music_explanation: TitleExplanation = Field(default_factory=TitleExplanation)
+    yt_playlist_explanation: TitleExplanation = Field(default_factory=TitleExplanation)
+
+
 class ResultSet(BaseModel):
     """하나의 결과 세트"""
     set_label: str = Field(description="세트 라벨 (예: 감성형, 검색형, 클릭형)")
@@ -138,6 +154,7 @@ class ResultSet(BaseModel):
     yt_playlist_title: str = Field(description="YouTube Playlist 제목")
     thumbnail: ThumbnailSuggestion
     seo_score: float = Field(ge=0, le=100, description="SEO 점수 (0~100)")
+    explanation: ResultSetExplanation | None = Field(default=None, description="제목 SEO 설명")
 
 
 class GenerationResponse(BaseModel):

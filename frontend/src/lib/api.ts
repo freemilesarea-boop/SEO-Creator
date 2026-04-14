@@ -36,12 +36,33 @@ export interface ThumbnailSuggestion {
   text_overlay: string;
 }
 
+export interface TitleFragment {
+  text: string;
+  reason: string;
+  type: string;
+}
+
+export interface TitleExplanation {
+  title: string;
+  keyword_type: string;
+  intent: string;
+  competition: string;
+  fragments: TitleFragment[];
+  summary: string;
+}
+
+export interface ResultSetExplanation {
+  yt_music_explanation: TitleExplanation;
+  yt_playlist_explanation: TitleExplanation;
+}
+
 export interface ResultSet {
   set_label: string;
   yt_music_title: string;
   yt_playlist_title: string;
   thumbnail: ThumbnailSuggestion;
   seo_score: number;
+  explanation?: ResultSetExplanation | null;
 }
 
 export interface GenerationResponse {

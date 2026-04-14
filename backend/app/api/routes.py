@@ -14,6 +14,8 @@ from backend.app.models.schemas import (
     GenerationResponse,
     AnalysisResult,
     ResultSet,
+    ResultSetExplanation,
+    TitleExplanation,
     PlaylistData,
     TrackInfo,
 )
@@ -29,6 +31,7 @@ from backend.app.services.keyword_engine import (
 from backend.app.services.title_generator import generate_title_sets
 from backend.app.services.thumbnail_generator import generate_thumbnail
 from backend.app.services.trends_ranker import enhance_with_trends
+from backend.app.services.explainer import explain_result_set
 from backend.app.models.database import async_session, GenerationHistory
 
 router = APIRouter(prefix="/api/v1", tags=["SEO Generator"])
@@ -83,6 +86,14 @@ def _build_response(
             if keyword_scores
             else 0.5
         )
+        # explanation 생성
+        expl_data = explain_result_set(
+            ts["yt_music_title"], ts["yt_playlist_title"], ts["set_label"]
+        )
+        explanation = ResultSetExplanation(
+            yt_music_explanation=TitleExplanation(**expl_data["yt_music_explanation"]),
+            yt_playlist_explanation=TitleExplanation(**expl_data["yt_playlist_explanation"]),
+        )
         result_sets.append(
             ResultSet(
                 set_label=ts["set_label"],
@@ -90,6 +101,7 @@ def _build_response(
                 yt_playlist_title=ts["yt_playlist_title"],
                 thumbnail=thumb,
                 seo_score=round(avg_score * 100, 1),
+                explanation=explanation,
             )
         )
 
