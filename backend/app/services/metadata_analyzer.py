@@ -39,7 +39,6 @@ def _get_artist_genre_map() -> dict:
 
 def _get_genre_keywords() -> dict:
     d = _load_dictionary()
-    # Try both top-level genre_keywords and nested genres.*.ko/en_keywords
     if "genre_keywords" in d:
         return d["genre_keywords"]
     result: dict[str, list[str]] = {}
@@ -73,8 +72,9 @@ def _get_situation_keywords() -> dict:
             result[sit] = kws
     return result
 
+
 # ---------------------------------------------------------------------------
-# Genre-mood and mood-situation correlations
+# Genre-mood correlations
 # ---------------------------------------------------------------------------
 
 _GENRE_MOOD_CORRELATION: dict[str, list[str]] = {
@@ -95,28 +95,111 @@ _GENRE_MOOD_CORRELATION: dict[str, list[str]] = {
     "ost": ["emotional", "romantic", "nostalgic"],
 }
 
+# ---------------------------------------------------------------------------
+# Mood-situation correlations (cooking/morning removed from broad moods)
+# ---------------------------------------------------------------------------
+
 _MOOD_SITUATION_CORRELATION: dict[str, list[str]] = {
     "chill": ["study", "cafe", "reading"],
-    "emotional": ["rain", "night_drive", "sleep"],
+    "emotional": ["rain", "night_drive"],
     "energetic": ["workout", "party", "commute"],
-    "dreamy": ["sleep", "night_drive", "reading"],
-    "sexy": ["night_drive", "party"],
-    "happy": ["morning", "walk", "cooking"],
-    "sad": ["rain", "sleep", "night_drive"],
-    "dark": ["night_drive", "workout"],
-    "romantic": ["cafe", "cooking", "walk"],
+    "dreamy": ["night_drive", "reading"],
+    "sexy": ["night_drive", "party", "late_night"],
+    "happy": ["morning", "walk", "commute"],
+    "sad": ["rain", "night_drive"],
+    "dark": ["night_drive", "late_night"],
+    "romantic": ["cafe", "walk"],
     "nostalgic": ["rain", "cafe", "walk"],
     "peaceful": ["morning", "reading", "walk"],
     "intense": ["workout", "party", "commute"],
 }
 
+# ---------------------------------------------------------------------------
+# [3] Artist situation priors – 아티스트 기반 situation 가중치
+# ---------------------------------------------------------------------------
+
+_ARTIST_SITUATION_PRIOR: dict[str, list[str]] = {
+    "the weeknd": ["late_night", "night_drive"],
+    "dua lipa": ["party", "workout"],
+    "harry styles": ["walk", "commute"],
+    "justin bieber": ["commute", "walk"],
+    "taylor swift": ["commute", "walk", "rain"],
+    "olivia rodrigo": ["night_drive", "rain"],
+    "billie eilish": ["late_night", "night_drive"],
+    "ariana grande": ["party", "workout"],
+    "bruno mars": ["party", "commute"],
+    "drake": ["night_drive", "late_night"],
+    "travis scott": ["night_drive", "party"],
+    "lana del rey": ["night_drive", "late_night", "rain"],
+    "frank ocean": ["late_night", "night_drive"],
+    "sza": ["late_night", "night_drive"],
+    "kendrick lamar": ["workout", "commute"],
+    "bts": ["workout", "party", "commute"],
+    "blackpink": ["workout", "party"],
+    "iu": ["cafe", "rain", "walk"],
+    "dean": ["late_night", "night_drive"],
+    "crush": ["late_night", "cafe"],
+    "heize": ["rain", "late_night"],
+    "newjeans": ["commute", "walk"],
+    "aespa": ["workout", "party"],
+}
+
+# ---------------------------------------------------------------------------
+# [2] High-precision situations – 엄격한 검출 조건
+# ---------------------------------------------------------------------------
+
+_HIGH_PRECISION_SITUATIONS = {"cooking", "study", "sleep", "cafe", "morning"}
+
+# cooking/study/sleep/cafe/morning을 허용하는 mood
+_PRECISION_ALLOW_MOODS: dict[str, set[str]] = {
+    "cooking": {"chill", "peaceful", "soft"},
+    "study": {"chill", "peaceful", "dreamy", "soft"},
+    "sleep": {"peaceful", "dreamy", "soft", "chill"},
+    "cafe": {"chill", "romantic", "peaceful", "nostalgic", "soft"},
+    "morning": {"peaceful", "happy", "soft"},
+}
+
+# cooking/study/sleep/cafe/morning을 허용하는 genre
+_PRECISION_ALLOW_GENRES: dict[str, set[str]] = {
+    "cooking": {"acoustic", "lofi", "jazz"},
+    "study": {"lofi", "classical", "ambient", "acoustic", "jazz"},
+    "sleep": {"ambient", "classical", "lofi", "acoustic"},
+    "cafe": {"jazz", "acoustic", "indie", "lofi", "ballad"},
+    "morning": {"acoustic", "indie", "lofi", "pop"},
+}
+
+# cooking/study/sleep/cafe/morning을 차단하는 mood
+_PRECISION_BLOCK_MOODS: dict[str, set[str]] = {
+    "cooking": {"energetic", "dark", "intense", "sexy"},
+    "study": {"energetic", "intense", "sexy"},
+    "sleep": {"energetic", "intense", "sexy", "happy"},
+    "cafe": {"intense", "dark"},
+    "morning": {"dark", "intense", "sexy"},
+}
+
+# ---------------------------------------------------------------------------
+# [4] Situation conflict penalties
+# ---------------------------------------------------------------------------
+
+_SITUATION_CONFLICTS: dict[str, list[str]] = {
+    "night_drive": ["cooking", "morning", "study"],
+    "party": ["sleep", "study", "reading", "cooking"],
+    "workout": ["sleep", "cooking", "reading", "cafe"],
+    "late_night": ["morning", "cooking"],
+}
+
+_MOOD_SUPPRESSES_SITUATION: dict[str, list[str]] = {
+    "dark": ["cooking", "morning"],
+    "intense": ["cooking", "sleep", "morning", "cafe"],
+    "energetic": ["sleep", "cooking"],
+    "sexy": ["cooking", "morning", "study"],
+}
 
 # ---------------------------------------------------------------------------
 # Hangul detection helper
 # ---------------------------------------------------------------------------
 
 def _contains_hangul(text: str) -> bool:
-    """Return True if the text contains any Hangul characters."""
     for ch in text:
         if "\uac00" <= ch <= "\ud7a3" or "\u3131" <= ch <= "\u3163" or "\u1100" <= ch <= "\u11ff":
             return True
@@ -124,7 +207,6 @@ def _contains_hangul(text: str) -> bool:
 
 
 def _contains_latin(text: str) -> bool:
-    """Return True if the text contains Latin alphabet characters."""
     for ch in text:
         if ("A" <= ch <= "Z") or ("a" <= ch <= "z"):
             return True
@@ -136,17 +218,8 @@ def _contains_latin(text: str) -> bool:
 # ---------------------------------------------------------------------------
 
 def detect_language(texts: list[str]) -> str:
-    """Detect whether the texts are Korean, English, or mixed.
-
-    Checks for the presence of Hangul characters vs Latin characters
-    across all provided texts.
-
-    Returns:
-        One of Language enum values: "ko", "en", or "mixed".
-    """
     has_hangul = False
     has_latin = False
-
     for text in texts:
         if _contains_hangul(text):
             has_hangul = True
@@ -154,44 +227,29 @@ def detect_language(texts: list[str]) -> str:
             has_latin = True
         if has_hangul and has_latin:
             return Language.MIXED.value
-
     if has_hangul:
         return Language.KOREAN.value
     return Language.ENGLISH.value
 
 
 def detect_genres(artists: list[str], titles: list[str]) -> list[str]:
-    """Detect genres from artist names and track titles.
-
-    Strategy:
-    1. Look up each artist in the artist_genre_map.
-    2. Scan track titles for genre-specific keywords from genre_keywords.
-    3. Aggregate and rank by frequency.
-
-    Returns:
-        List of genre strings ordered by frequency (most common first).
-    """
     genre_counter: Counter[str] = Counter()
 
-    # --- Artist-based genre detection ---
     artist_lower_map = {k.lower(): v for k, v in _get_artist_genre_map().items()}
     for artist in artists:
         key = artist.strip().lower()
         if key in artist_lower_map:
             val = artist_lower_map[key]
-            # Handle both string ("kpop") and list (["kpop", "pop"]) values
             genres_for_artist = val if isinstance(val, list) else [val]
             for genre in genres_for_artist:
                 genre_counter[genre] += 1
 
-    # --- Title keyword-based genre detection ---
     combined_text = " ".join(t.lower() for t in titles)
     for genre, keywords in _get_genre_keywords().items():
         for kw in keywords:
             if kw.lower() in combined_text:
                 genre_counter[genre] += 1
 
-    # Validate against Genre enum values and return sorted by frequency
     valid_genres = {g.value for g in Genre}
     detected = [
         genre for genre, _ in genre_counter.most_common()
@@ -201,32 +259,19 @@ def detect_genres(artists: list[str], titles: list[str]) -> list[str]:
 
 
 def detect_moods(titles: list[str], genres: list[str]) -> list[str]:
-    """Detect moods from track titles and correlated genres.
-
-    Strategy:
-    1. Scan titles for mood-related keywords (Korean and English).
-    2. Add correlated moods from detected genres.
-    3. Aggregate and rank by frequency.
-
-    Returns:
-        List of mood strings ordered by frequency (most common first).
-    """
     mood_counter: Counter[str] = Counter()
 
-    # --- Title keyword scanning ---
     combined_text = " ".join(t.lower() for t in titles)
     for mood, keywords in _get_mood_keywords().items():
         for kw in keywords:
             if kw.lower() in combined_text:
                 mood_counter[mood] += 1
 
-    # --- Genre-mood correlation ---
     for genre in genres:
         correlated_moods = _GENRE_MOOD_CORRELATION.get(genre, [])
         for m in correlated_moods:
             mood_counter[m] += 1
 
-    # Validate against Mood enum values
     valid_moods = {m.value for m in Mood}
     detected = [
         mood for mood, _ in mood_counter.most_common()
@@ -235,38 +280,106 @@ def detect_moods(titles: list[str], genres: list[str]) -> list[str]:
     return detected
 
 
-def detect_situations(titles: list[str], moods: list[str]) -> list[str]:
-    """Detect situations from track titles and correlated moods.
+def detect_situations(
+    titles: list[str],
+    moods: list[str],
+    genres: list[str] | None = None,
+    artists: list[str] | None = None,
+) -> list[str]:
+    """Detect situations with precision filtering and conflict penalties.
 
-    Strategy:
-    1. Scan titles for situation-related keywords.
-    2. Add correlated situations from detected moods.
-    3. Aggregate and rank by frequency.
-
-    Returns:
-        List of situation strings ordered by frequency (most common first).
+    Improvements over naive version:
+    - High-precision mode for daily-life tags (cooking, study, sleep, etc.)
+    - Artist-based situation priors
+    - Conflict penalties between contradictory situations
+    - Output capped at top 3
     """
+    genres = genres or []
+    artists = artists or []
     situation_counter: Counter[str] = Counter()
 
-    # --- Title keyword scanning ---
+    # --- 1. Title keyword scanning ---
     combined_text = " ".join(t.lower() for t in titles)
     for situation, keywords in _get_situation_keywords().items():
         for kw in keywords:
             if kw.lower() in combined_text:
                 situation_counter[situation] += 1
 
-    # --- Mood-situation correlation ---
+    # --- 2. Mood-situation correlation ---
     for mood in moods:
         correlated_situations = _MOOD_SITUATION_CORRELATION.get(mood, [])
         for s in correlated_situations:
             situation_counter[s] += 1
 
-    # Validate against Situation enum values
+    # --- 3. Artist situation priors (weight=2 each) ---
+    for artist in artists:
+        key = artist.strip().lower()
+        priors = _ARTIST_SITUATION_PRIOR.get(key, [])
+        for s in priors:
+            situation_counter[s] += 2
+
+    # --- 4. High-precision gate for daily-life situations ---
+    mood_set = set(moods)
+    genre_set = set(genres)
+    to_remove: list[str] = []
+
+    for sit in _HIGH_PRECISION_SITUATIONS:
+        if sit not in situation_counter:
+            continue
+
+        allow_moods = _PRECISION_ALLOW_MOODS.get(sit, set())
+        allow_genres = _PRECISION_ALLOW_GENRES.get(sit, set())
+        block_moods = _PRECISION_BLOCK_MOODS.get(sit, set())
+
+        has_allow_mood = bool(mood_set & allow_moods)
+        has_allow_genre = bool(genre_set & allow_genres)
+        has_block_mood = bool(mood_set & block_moods)
+
+        # Block if blocking moods present
+        if has_block_mood:
+            to_remove.append(sit)
+            continue
+
+        # Need at least one allowing mood AND one allowing genre
+        if not (has_allow_mood and has_allow_genre):
+            to_remove.append(sit)
+            continue
+
+    for sit in to_remove:
+        del situation_counter[sit]
+
+    # --- 5. Conflict penalties ---
+    for strong_sit, weak_sits in _SITUATION_CONFLICTS.items():
+        if strong_sit in situation_counter and situation_counter[strong_sit] >= 2:
+            for weak in weak_sits:
+                if weak in situation_counter:
+                    situation_counter[weak] = max(0, situation_counter[weak] - 3)
+                    if situation_counter[weak] <= 0:
+                        del situation_counter[weak]
+
+    # Mood-based suppression
+    for mood in moods[:3]:  # top 3 moods only
+        suppressed = _MOOD_SUPPRESSES_SITUATION.get(mood, [])
+        for sit in suppressed:
+            if sit in situation_counter:
+                situation_counter[sit] = max(0, situation_counter[sit] - 2)
+                if situation_counter[sit] <= 0:
+                    del situation_counter[sit]
+
+    # --- 6. Validate and cap at top 3 ---
     valid_situations = {s.value for s in Situation}
     detected = [
-        situation for situation, _ in situation_counter.most_common()
-        if situation in valid_situations
+        situation for situation, cnt in situation_counter.most_common(3)
+        if situation in valid_situations and cnt > 0
     ]
+
+    # Ensure at least 1 result
+    if not detected:
+        if genres and genres[0] == "pop":
+            detected = ["commute"]
+        else:
+            detected = ["study"]
+
     return detected
 
 
@@ -277,15 +390,6 @@ def build_keyword_pool(
     artists: list[str],
     language: str,
 ) -> list[str]:
-    """Combine all detected elements into a ranked keyword pool.
-
-    The pool is ordered by category priority: genres first, then moods,
-    situations, top artists, and finally the language tag. Duplicates
-    are removed while preserving order.
-
-    Returns:
-        Deduplicated list of keyword strings.
-    """
     pool: list[str] = []
     seen: set[str] = set()
 
@@ -294,14 +398,12 @@ def build_keyword_pool(
             pool.append(item)
             seen.add(item)
 
-    # Add top artists (up to 5, already pre-sliced by caller but guard here)
     for artist in artists[:5]:
         normalized = artist.strip()
         if normalized and normalized not in seen:
             pool.append(normalized)
             seen.add(normalized)
 
-    # Add language tag
     if language and language not in seen:
         pool.append(language)
         seen.add(language)
@@ -310,44 +412,23 @@ def build_keyword_pool(
 
 
 def analyze_playlist(playlist: PlaylistData) -> AnalysisResult:
-    """Main analysis function.
-
-    Analyzes all tracks in a playlist to detect genre, mood, situation,
-    and language, then returns a comprehensive AnalysisResult.
-
-    Args:
-        playlist: Parsed playlist data containing track information.
-
-    Returns:
-        AnalysisResult with detected attributes and primary selections.
-    """
-    # -- Extract all artist names and track titles --
     artists: list[str] = [track.artist for track in playlist.tracks]
     titles: list[str] = [track.title for track in playlist.tracks]
 
-    # -- Find top repeated artists (up to 5) --
     artist_counter = Counter(a.strip() for a in artists if a.strip())
     top_artists = [artist for artist, _ in artist_counter.most_common(5)]
 
-    # -- Detect language --
     all_texts = titles + artists
     language = detect_language(all_texts)
 
-    # -- Detect genres --
     genres = detect_genres(artists, titles)
-
-    # -- Detect moods (uses detected genres for correlation) --
     moods = detect_moods(titles, genres)
+    situations = detect_situations(titles, moods, genres, artists)
 
-    # -- Detect situations (uses detected moods for correlation) --
-    situations = detect_situations(titles, moods)
-
-    # -- Primary values = highest frequency (first element) --
     primary_genre = genres[0] if genres else Genre.POP.value
     primary_mood = moods[0] if moods else Mood.CHILL.value
     primary_situation = situations[0] if situations else Situation.STUDY.value
 
-    # -- Build keyword pool --
     keyword_pool = build_keyword_pool(genres, moods, situations, top_artists, language)
 
     return AnalysisResult(
