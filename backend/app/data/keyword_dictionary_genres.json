@@ -1,0 +1,137 @@
+{
+  "pop": {
+    "ko_keywords": ["팝", "팝송", "팝 음악", "해외 팝", "영어 노래", "빌보드", "인기 팝", "팝 히트곡", "서양 음악", "글로벌 팝"],
+    "en_keywords": ["pop", "pop music", "pop songs", "top hits", "billboard", "mainstream pop", "pop playlist", "radio hits", "chart toppers", "global hits"],
+    "related_artists": ["Taylor Swift", "Dua Lipa", "The Weeknd", "Olivia Rodrigo", "Harry Styles", "Billie Eilish", "Ed Sheeran", "Ariana Grande", "Bruno Mars", "Sabrina Carpenter"],
+    "related_moods": ["happy", "energetic", "romantic"],
+    "related_situations": ["commute", "party", "walk"],
+    "visual_keywords": ["colorful stage", "concert lights", "headphones", "vinyl record", "neon sign"],
+    "color_tones": ["bright pink", "electric blue", "vivid coral", "warm yellow"]
+  },
+  "kpop": {
+    "ko_keywords": ["케이팝", "K-POP", "한국 음악", "아이돌", "한국 팝", "케이팝 노래", "한류 음악", "아이돌 음악", "한국 히트곡", "케이팝 플레이리스트"],
+    "en_keywords": ["kpop", "k-pop", "korean pop", "korean music", "idol music", "hallyu", "kpop playlist", "kpop hits", "korean hits", "k-pop songs"],
+    "related_artists": ["BTS", "BLACKPINK", "aespa", "Stray Kids", "NewJeans", "IVE", "SEVENTEEN", "(G)I-DLE", "LE SSERAFIM", "TWICE", "EXO", "Red Velvet", "NCT", "TXT", "ENHYPEN"],
+    "related_moods": ["energetic", "happy", "emotional"],
+    "related_situations": ["party", "workout", "commute"],
+    "visual_keywords": ["neon hangul", "seoul skyline", "idol aesthetic", "pastel gradient", "korean street"],
+    "color_tones": ["hot pink", "lavender", "electric purple", "soft cyan"]
+  },
+  "rnb": {
+    "ko_keywords": ["알앤비", "R&B", "알엔비", "소울", "네오소울", "감성 R&B", "한국 알앤비", "소울 음악", "R&B 노래", "알앤비 감성"],
+    "en_keywords": ["rnb", "r&b", "r and b", "soul", "neo soul", "contemporary rnb", "smooth rnb", "rnb vibes", "slow jams", "rnb playlist"],
+    "related_artists": ["Dean", "Crush", "BIBI", "Heize", "Zion.T", "LANY", "SZA", "Daniel Caesar", "Frank Ocean", "Khalid", "H.E.R.", "Summer Walker"],
+    "related_moods": ["sexy", "chill", "romantic", "dreamy"],
+    "related_situations": ["night_drive", "late_night", "rain"],
+    "visual_keywords": ["city night", "neon reflection", "midnight mood", "silk texture", "dim lighting"],
+    "color_tones": ["deep purple", "midnight blue", "rose gold", "dark wine"]
+  },
+  "hiphop": {
+    "ko_keywords": ["힙합", "랩", "한국 힙합", "K-힙합", "래퍼", "힙합 비트", "붐뱁", "트랩", "힙합 노래", "국힙"],
+    "en_keywords": ["hiphop", "hip hop", "rap", "trap", "boom bap", "hip hop beats", "rap music", "rap playlist", "hip hop mix", "underground hiphop"],
+    "related_artists": ["Jay Park", "Zico", "pH-1", "GRAY", "BewhY", "Dok2", "Kendrick Lamar", "Drake", "Travis Scott", "J. Cole", "Tyler the Creator", "21 Savage"],
+    "related_moods": ["energetic", "dark", "intense"],
+    "related_situations": ["workout", "party", "night_drive"],
+    "visual_keywords": ["graffiti wall", "urban street", "boombox", "gold chain", "sneakers"],
+    "color_tones": ["matte black", "gold", "blood red", "dark gray"]
+  },
+  "lofi": {
+    "ko_keywords": ["로파이", "로우파이", "로파이 비트", "잔잔한 비트", "공부 음악", "로파이 힙합", "카페 음악", "편안한 음악", "배경 음악", "집중 음악"],
+    "en_keywords": ["lofi", "lo-fi", "lofi beats", "lofi hip hop", "chill beats", "study beats", "lofi music", "beats to relax", "lofi chill", "chillhop"],
+    "related_artists": ["Jazzinuf", "idealism", "j^p^n", "Kupla", "Saib", "Tomppabeats", "Wun Two", "Jinsang", "Mondo Loops", "SwuM"],
+    "related_moods": ["chill", "dreamy", "peaceful", "nostalgic"],
+    "related_situations": ["study", "cafe", "rain", "sleep"],
+    "visual_keywords": ["anime desk", "rainy window", "coffee cup", "old cassette", "warm lamplight"],
+    "color_tones": ["warm beige", "soft brown", "muted orange", "dusty pink"]
+  },
+  "jazz": {
+    "ko_keywords": ["재즈", "재즈 음악", "재즈 피아노", "스무스 재즈", "재즈 보컬", "모던 재즈", "카페 재즈", "바 재즈", "클래식 재즈", "재즈 라운지"],
+    "en_keywords": ["jazz", "smooth jazz", "jazz piano", "jazz vocals", "modern jazz", "classic jazz", "jazz lounge", "cool jazz", "bossa nova", "jazz standards"],
+    "related_artists": ["Chet Baker", "Miles Davis", "Bill Evans", "Norah Jones", "Kamasi Washington", "Robert Glasper", "Youn Sun Nah", "Moon", "Snarky Puppy", "Esperanza Spalding"],
+    "related_moods": ["chill", "romantic", "nostalgic", "dreamy"],
+    "related_situations": ["cafe", "rain", "late_night", "cooking"],
+    "visual_keywords": ["saxophone silhouette", "jazz club", "warm candlelight", "vinyl spinning", "smoke haze"],
+    "color_tones": ["warm amber", "deep brown", "burgundy", "aged gold"]
+  },
+  "indie": {
+    "ko_keywords": ["인디", "인디 음악", "인디밴드", "한국 인디", "인디 팝", "독립 음악", "감성 인디", "인디 록", "인디씬", "인디 플레이리스트"],
+    "en_keywords": ["indie", "indie pop", "indie rock", "indie music", "alternative", "indie folk", "indie playlist", "indie vibes", "bedroom pop", "dream pop"],
+    "related_artists": ["Hyukoh", "Se So Neon", "Jannabi", "Silica Gel", "The Black Skirts", "Phoebe Bridgers", "Bon Iver", "Tame Impala", "Mac DeMarco", "Clairo", "beabadoobee"],
+    "related_moods": ["dreamy", "nostalgic", "chill", "emotional"],
+    "related_situations": ["walk", "cafe", "sunset", "travel"],
+    "visual_keywords": ["wildflower field", "polaroid photo", "vintage camera", "sunset road", "old bookshop"],
+    "color_tones": ["faded olive", "dusty rose", "warm cream", "soft teal"]
+  },
+  "rock": {
+    "ko_keywords": ["록", "록 음악", "밴드 음악", "록 밴드", "얼터너티브 록", "인디 록", "한국 록", "록 플레이리스트", "기타 음악", "록 노래"],
+    "en_keywords": ["rock", "rock music", "alternative rock", "classic rock", "rock band", "guitar rock", "rock playlist", "rock anthems", "grunge", "post rock"],
+    "related_artists": ["Nell", "YB", "Jaurim", "Radiohead", "Arctic Monkeys", "Red Hot Chili Peppers", "Nirvana", "Linkin Park", "Foo Fighters", "The Strokes"],
+    "related_moods": ["energetic", "intense", "dark", "nostalgic"],
+    "related_situations": ["workout", "night_drive", "party"],
+    "visual_keywords": ["electric guitar", "stadium lights", "drum kit", "leather jacket", "garage band"],
+    "color_tones": ["charcoal black", "fiery red", "steel gray", "distressed white"]
+  },
+  "ballad": {
+    "ko_keywords": ["발라드", "한국 발라드", "슬픈 노래", "감성 발라드", "발라드 명곡", "이별 노래", "발라드 모음", "한국 명곡", "감동적인 노래", "발라드 플레이리스트"],
+    "en_keywords": ["ballad", "korean ballad", "sad songs", "emotional ballad", "slow songs", "ballad playlist", "love ballad", "heartbreak songs", "acoustic ballad", "ballad collection"],
+    "related_artists": ["IU", "성시경", "이소라", "백예린", "폴킴", "10cm", "이무진", "Adele", "Sam Smith", "정승환", "볼빨간사춘기"],
+    "related_moods": ["emotional", "sad", "romantic", "nostalgic"],
+    "related_situations": ["rain", "breakup", "late_night", "sleep"],
+    "visual_keywords": ["falling petals", "empty bench", "raindrops on glass", "handwritten letter", "dimly lit room"],
+    "color_tones": ["soft gray", "muted blue", "pale lavender", "faded white"]
+  },
+  "electronic": {
+    "ko_keywords": ["일렉트로닉", "전자 음악", "EDM", "일렉트로니카", "신스팝", "테크노", "프로그레시브", "일렉 팝", "댄스 음악", "베이스 뮤직"],
+    "en_keywords": ["electronic", "edm", "electronica", "synth pop", "techno", "dance music", "electronic music", "bass music", "progressive house", "future bass"],
+    "related_artists": ["Peggy Gou", "Fred Again", "Calvin Harris", "Disclosure", "ODESZA", "Flume", "Porter Robinson", "Rezz", "Deadmau5", "Skrillex"],
+    "related_moods": ["energetic", "intense", "dreamy", "dark"],
+    "related_situations": ["party", "workout", "night_drive"],
+    "visual_keywords": ["dj turntable", "laser show", "LED tunnel", "synth wave grid", "equalizer bars"],
+    "color_tones": ["electric cyan", "neon magenta", "ultraviolet", "dark black"]
+  },
+  "house": {
+    "ko_keywords": ["하우스", "딥하우스", "테크하우스", "하우스 음악", "클럽 음악", "하우스 비트", "소울풀 하우스", "애시드 하우스", "하우스 믹스", "하우스 DJ"],
+    "en_keywords": ["house", "deep house", "tech house", "house music", "club music", "soulful house", "acid house", "afro house", "house beats", "house mix"],
+    "related_artists": ["Kerri Chandler", "Larry Heard", "Peggy Gou", "Fisher", "Chris Lake", "Honey Dijon", "Jamie XX", "Kaytranada", "Black Coffee", "Solomun"],
+    "related_moods": ["energetic", "chill", "sexy"],
+    "related_situations": ["party", "night_drive", "sunset"],
+    "visual_keywords": ["club dancefloor", "sunset beach dj", "disco ball", "strobe lights", "rooftop party"],
+    "color_tones": ["sunset orange", "neon green", "deep navy", "warm gold"]
+  },
+  "classical": {
+    "ko_keywords": ["클래식", "클래식 음악", "피아노 곡", "오케스트라", "실내악", "클래식 명곡", "클래식 피아노", "교향곡", "클래식 모음", "바이올린 곡"],
+    "en_keywords": ["classical", "classical music", "piano classical", "orchestra", "symphony", "chamber music", "classical piano", "violin classical", "classical playlist", "classical masterpieces"],
+    "related_artists": ["Yiruma", "Chopin", "Debussy", "Beethoven", "Mozart", "Yundi Li", "Lang Lang", "Ludovico Einaudi", "Max Richter", "Yo-Yo Ma"],
+    "related_moods": ["peaceful", "emotional", "dreamy"],
+    "related_situations": ["study", "reading", "sleep", "morning"],
+    "visual_keywords": ["grand piano", "concert hall", "sheet music", "chandelier", "marble columns"],
+    "color_tones": ["ivory white", "rich black", "deep mahogany", "soft gold"]
+  },
+  "acoustic": {
+    "ko_keywords": ["어쿠스틱", "통기타", "어쿠스틱 음악", "어쿠스틱 팝", "기타 연주", "통기타 노래", "어쿠스틱 커버", "기타 발라드", "손글씨 감성", "어쿠스틱 모음"],
+    "en_keywords": ["acoustic", "acoustic guitar", "acoustic pop", "unplugged", "acoustic cover", "fingerstyle", "acoustic music", "acoustic vibes", "campfire songs", "acoustic session"],
+    "related_artists": ["Jason Mraz", "John Mayer", "Suzanne Ciani", "10cm", "Eddy Kim", "Sungha Jung", "Iron & Wine", "Jack Johnson", "Colbie Caillat", "Sam Kim"],
+    "related_moods": ["peaceful", "romantic", "nostalgic", "chill"],
+    "related_situations": ["cafe", "morning", "walk", "cooking"],
+    "visual_keywords": ["wooden guitar", "campfire night", "morning sunlight", "coffee table", "open window"],
+    "color_tones": ["natural wood", "warm honey", "soft cream", "earthy brown"]
+  },
+  "citypop": {
+    "ko_keywords": ["시티팝", "일본 시티팝", "80년대 시티팝", "레트로 팝", "시티팝 감성", "네온 시티팝", "시티팝 모음", "일본 80년대", "시티팝 명곡", "시티팝 플레이리스트"],
+    "en_keywords": ["city pop", "japanese city pop", "80s city pop", "retro pop", "future funk", "city pop playlist", "city pop vibes", "neo city pop", "japanese retro", "city pop mix"],
+    "related_artists": ["Tatsuro Yamashita", "Mariya Takeuchi", "Taeko Onuki", "Anri", "Miki Matsubara", "Junko Ohashi", "Toshiki Kadomatsu", "Meiko Nakahara", "Night Tempo", "Yogee New Waves"],
+    "related_moods": ["nostalgic", "dreamy", "chill", "romantic"],
+    "related_situations": ["night_drive", "sunset", "late_night"],
+    "visual_keywords": ["retro neon sign", "80s car dashboard", "palm tree sunset", "vhs glitch", "japanese cityscape"],
+    "color_tones": ["neon pink", "teal blue", "retro orange", "sunset purple"]
+  },
+  "ambient": {
+    "ko_keywords": ["앰비언트", "환경 음악", "명상 음악", "자연 소리", "백색소음", "공간 음악", "앰비언트 사운드", "힐링 음악", "분위기 음악", "수면 음악"],
+    "en_keywords": ["ambient", "ambient music", "meditation music", "nature sounds", "soundscape", "atmospheric music", "drone music", "ambient electronic", "healing sounds", "ambient mix"],
+    "related_artists": ["Brian Eno", "Sigur Ros", "Nils Frahm", "Stars of the Lid", "Tim Hecker", "Aphex Twin", "Tycho", "Boards of Canada", "Hammock", "Grouper"],
+    "related_moods": ["peaceful", "dreamy", "chill"],
+    "related_situations": ["sleep", "study", "rain", "morning"],
+    "visual_keywords": ["misty forest", "still lake", "northern lights", "fog mountain", "ocean horizon"],
+    "color_tones": ["soft white", "pale gray", "misty blue", "sage green"]
+  }
+}

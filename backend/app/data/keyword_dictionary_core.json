@@ -1,0 +1,199 @@
+{
+  "artist_genre_map": {
+    "BTS": "kpop", "BLACKPINK": "kpop", "aespa": "kpop", "Stray Kids": "kpop",
+    "NewJeans": "kpop", "IVE": "kpop", "SEVENTEEN": "kpop", "(G)I-DLE": "kpop",
+    "LE SSERAFIM": "kpop", "TWICE": "kpop", "EXO": "kpop", "Red Velvet": "kpop",
+    "NCT": "kpop", "TXT": "kpop", "ENHYPEN": "kpop", "ITZY": "kpop",
+    "ATEEZ": "kpop", "NMIXX": "kpop", "Stayc": "kpop", "ILLIT": "kpop",
+    "Taylor Swift": "pop", "Dua Lipa": "pop", "The Weeknd": "pop",
+    "Olivia Rodrigo": "pop", "Harry Styles": "pop", "Billie Eilish": "pop",
+    "Ed Sheeran": "pop", "Ariana Grande": "pop", "Bruno Mars": "pop",
+    "Sabrina Carpenter": "pop", "Lana Del Rey": "pop", "Doja Cat": "pop",
+    "Charlie Puth": "pop", "Troye Sivan": "pop",
+    "Dean": "rnb", "Crush": "rnb", "BIBI": "rnb", "Heize": "rnb",
+    "Zion.T": "rnb", "SZA": "rnb", "Daniel Caesar": "rnb", "Frank Ocean": "rnb",
+    "Khalid": "rnb", "H.E.R.": "rnb", "Summer Walker": "rnb", "LANY": "rnb",
+    "Brent Faiyaz": "rnb", "Jhene Aiko": "rnb",
+    "Jay Park": "hiphop", "Zico": "hiphop", "pH-1": "hiphop", "GRAY": "hiphop",
+    "BewhY": "hiphop", "Dok2": "hiphop", "Kendrick Lamar": "hiphop",
+    "Drake": "hiphop", "Travis Scott": "hiphop", "J. Cole": "hiphop",
+    "Tyler the Creator": "hiphop", "21 Savage": "hiphop", "Sik-K": "hiphop",
+    "Jazzinuf": "lofi", "idealism": "lofi", "Kupla": "lofi", "Saib": "lofi",
+    "Tomppabeats": "lofi", "Jinsang": "lofi", "SwuM": "lofi",
+    "Chet Baker": "jazz", "Miles Davis": "jazz", "Bill Evans": "jazz",
+    "Norah Jones": "jazz", "Kamasi Washington": "jazz", "Robert Glasper": "jazz",
+    "Hyukoh": "indie", "Se So Neon": "indie", "Jannabi": "indie",
+    "The Black Skirts": "indie", "Silica Gel": "indie", "Phoebe Bridgers": "indie",
+    "Bon Iver": "indie", "Tame Impala": "indie", "Mac DeMarco": "indie",
+    "Clairo": "indie", "beabadoobee": "indie",
+    "Nell": "rock", "YB": "rock", "Radiohead": "rock",
+    "Arctic Monkeys": "rock", "Nirvana": "rock", "Linkin Park": "rock",
+    "IU": "ballad", "성시경": "ballad", "이소라": "ballad", "백예린": "ballad",
+    "폴킴": "ballad", "10cm": "ballad", "이무진": "ballad",
+    "Adele": "ballad", "Sam Smith": "ballad", "정승환": "ballad",
+    "볼빨간사춘기": "ballad",
+    "Peggy Gou": "electronic", "Fred Again": "electronic", "Calvin Harris": "electronic",
+    "ODESZA": "electronic", "Flume": "electronic", "Porter Robinson": "electronic",
+    "Yiruma": "classical", "Chopin": "classical", "Debussy": "classical",
+    "Ludovico Einaudi": "classical", "Max Richter": "classical",
+    "Jason Mraz": "acoustic", "John Mayer": "acoustic", "Jack Johnson": "acoustic",
+    "Sam Kim": "acoustic",
+    "Tatsuro Yamashita": "citypop", "Mariya Takeuchi": "citypop",
+    "Anri": "citypop", "Night Tempo": "citypop",
+    "Brian Eno": "ambient", "Sigur Ros": "ambient", "Nils Frahm": "ambient",
+    "Tycho": "ambient",
+    "Fisher": "house", "Chris Lake": "house", "Jamie XX": "house",
+    "Kaytranada": "house", "Black Coffee": "house",
+    "Bad Bunny": "latin", "J Balvin": "latin", "Rosalia": "latin",
+    "YOASOBI": "jpop", "Ado": "jpop", "Kenshi Yonezu": "jpop", "Fujii Kaze": "jpop"
+  },
+  "title_templates": {
+    "yt_music": {
+      "ko": [
+        "{situation} {genre}",
+        "{mood} {genre}",
+        "{mood} {situation} {genre}",
+        "{situation} {mood} 음악",
+        "{mood} {genre} 모음",
+        "{situation} 감성 {genre}",
+        "{mood} 느낌 {genre}",
+        "{genre} {situation} 믹스",
+        "{mood} {genre} 노래",
+        "{situation} {genre} 추천",
+        "{genre} {mood} 감성",
+        "오늘의 {mood} {genre}",
+        "{mood} {genre} 히트",
+        "{situation}용 {genre}",
+        "{genre} {mood} 셀렉션",
+        "{situation} 분위기 {genre}",
+        "{mood} 무드 {genre}",
+        "{genre} 베스트 {mood}"
+      ],
+      "en": [
+        "{mood} {genre}",
+        "{situation} {genre}",
+        "{mood} {genre} mix",
+        "{situation} {mood} {genre}",
+        "{genre} for {situation}",
+        "{mood} {genre} vibes",
+        "{situation} {genre} beats",
+        "{mood} {situation} music",
+        "best {mood} {genre}",
+        "{genre} {mood} hits",
+        "{situation} time {genre}",
+        "{mood} {genre} essentials",
+        "{genre} {situation} edition",
+        "top {mood} {genre}",
+        "{genre} {mood} select",
+        "{situation} mode {genre}",
+        "pure {mood} {genre}",
+        "{genre} {mood} collection"
+      ]
+    },
+    "yt_playlist": {
+      "ko": [
+        "{situation}에 듣기 좋은 {mood} {genre} 플레이리스트",
+        "{situation} 때 분위기 살려주는 {mood} {genre} 모음",
+        "{mood} 감성의 {genre} 노래 모음 | {situation}용",
+        "{situation} 분위기에 어울리는 {mood} {genre} 플레이리스트",
+        "{mood} 느낌 가득한 {genre} 플레이리스트 | {situation}",
+        "듣기만 해도 {mood} 해지는 {genre} 모음 | {situation}",
+        "{situation} {mood} {genre} 플레이리스트 추천",
+        "{mood} 분위기의 {genre} 모음 | {situation} 추천 플레이리스트",
+        "{situation}할 때 빠져드는 {mood} {genre} 노래 모음",
+        "{genre} 좋아한다면 꼭 들어야 할 {mood} 플레이리스트",
+        "{mood} {genre} 노래 모음 | {situation} 감성 플레이리스트",
+        "이 {genre} 틀면 {mood} 감성 폭발 | {situation} 추천",
+        "{situation} 감성 제대로 잡아주는 {mood} {genre}",
+        "{mood} 무드의 {genre} 명곡 모음 | {situation} 에디션",
+        "지금 듣기 딱 좋은 {mood} {genre} | {situation} 플리",
+        "{situation} 때 이 {genre} 들으면 분위기 미쳐요",
+        "{mood} 감성 {genre} 모음 | 반복 재생 주의",
+        "{genre} 플레이리스트 | {situation} x {mood} 조합"
+      ],
+      "en": [
+        "{mood} {genre} playlist for {situation}",
+        "best {mood} {genre} songs for {situation}",
+        "{mood} {genre} mix | perfect for {situation}",
+        "{situation} vibes - {mood} {genre} playlist",
+        "the ultimate {mood} {genre} playlist | {situation} edition",
+        "{mood} {genre} collection for your {situation} moments",
+        "{genre} songs that feel {mood} | {situation} playlist",
+        "{situation} mood - curated {mood} {genre} mix",
+        "feel the {mood} vibes | {genre} playlist for {situation}",
+        "top {mood} {genre} tracks for {situation}",
+        "{genre} you need for {situation} | {mood} vibes",
+        "when you need {mood} {genre} | {situation} playlist",
+        "{mood} {genre} essentials | {situation} edition",
+        "{situation} approved {mood} {genre} playlist",
+        "{genre} playlist | {mood} x {situation} combo",
+        "the best {mood} {genre} for every {situation}",
+        "{mood} {genre} songs that hit different | {situation}",
+        "press play | {mood} {genre} for {situation}"
+      ]
+    }
+  },
+  "seo_modifiers": {
+    "ko": ["플레이리스트", "모음", "추천", "베스트", "TOP", "노래", "음악", "명곡", "히트곡", "인기곡", "듣기 좋은", "반복 재생"],
+    "en": ["playlist", "mix", "compilation", "best", "top", "songs", "music", "hits", "collection", "essentials", "must listen", "on repeat"]
+  },
+  "banned_words": {
+    "ko": ["미쳤", "ㄹㅇ", "실화", "레전드", "충격", "극혐", "개쩌는", "대박사건", "긴급속보", "충격실화"],
+    "en": ["insane", "shocking", "crazy", "you won't believe", "gone wrong", "clickbait", "must see", "exposed", "leaked", "OMG"]
+  },
+  "language_variants": {
+    "ko": {
+      "genre_display": {
+        "kpop": "케이팝", "pop": "팝", "rnb": "알앤비", "hiphop": "힙합",
+        "lofi": "로파이", "jazz": "재즈", "indie": "인디", "rock": "록",
+        "ballad": "발라드", "electronic": "일렉트로닉", "house": "하우스",
+        "classical": "클래식", "acoustic": "어쿠스틱", "citypop": "시티팝",
+        "ambient": "앰비언트", "edm": "EDM", "latin": "라틴", "jpop": "제이팝", "ost": "OST"
+      },
+      "mood_display": {
+        "chill": "차분한", "emotional": "감성적인", "dreamy": "몽환적인",
+        "sexy": "섹시한", "energetic": "신나는", "romantic": "로맨틱한",
+        "dark": "어두운", "nostalgic": "그리운", "soft": "부드러운",
+        "uplifting": "밝은", "lonely": "외로운", "cinematic": "시네마틱",
+        "happy": "행복한", "sad": "슬픈", "peaceful": "평화로운", "intense": "강렬한"
+      },
+      "situation_display": {
+        "night_drive": "밤 드라이브", "study": "공부", "workout": "운동",
+        "cafe": "카페", "sleep": "수면", "rain": "비 오는 날",
+        "breakup": "이별", "morning": "아침", "sunset": "노을",
+        "party": "파티", "travel": "여행", "late_night": "새벽",
+        "commute": "출퇴근", "cooking": "요리", "reading": "독서", "walk": "산책"
+      }
+    },
+    "en": {
+      "genre_display": {
+        "kpop": "K-Pop", "pop": "Pop", "rnb": "R&B", "hiphop": "Hip-Hop",
+        "lofi": "Lo-Fi", "jazz": "Jazz", "indie": "Indie", "rock": "Rock",
+        "ballad": "Ballad", "electronic": "Electronic", "house": "House",
+        "classical": "Classical", "acoustic": "Acoustic", "citypop": "City Pop",
+        "ambient": "Ambient", "edm": "EDM", "latin": "Latin", "jpop": "J-Pop", "ost": "OST"
+      }
+    }
+  },
+  "scoring_hints": {
+    "high_value_combos": [
+      ["lofi", "study"],
+      ["ballad", "rain"],
+      ["kpop", "workout"],
+      ["rnb", "night_drive"],
+      ["jazz", "cafe"],
+      ["acoustic", "morning"],
+      ["hiphop", "workout"],
+      ["ambient", "sleep"],
+      ["citypop", "night_drive"],
+      ["classical", "study"]
+    ],
+    "score_weights": {
+      "relevance": 0.30,
+      "search_intent": 0.25,
+      "mood_match": 0.15,
+      "genre_match": 0.15,
+      "spam_penalty": 0.15
+    }
+  }
+}

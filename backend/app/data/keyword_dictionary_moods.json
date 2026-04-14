@@ -1,0 +1,98 @@
+{
+  "chill": {
+    "ko_keywords": ["차분한", "편안한", "릴렉스", "느긋한", "여유로운", "잔잔한", "칠", "힐링", "쉬는", "나른한"],
+    "en_keywords": ["chill", "relaxed", "laid back", "mellow", "easy going", "calm", "soothing", "breezy", "tranquil", "cozy"],
+    "color_tones": ["pastel blue", "soft mint", "warm beige", "light lavender"],
+    "visual_concepts": ["sunset beach", "hammock in shade", "coffee steam", "lazy afternoon", "open window breeze"],
+    "title_patterns_ko": ["{genre} 칠 플레이리스트", "편안한 {genre} 모음", "여유로운 {genre} 듣기"],
+    "title_patterns_en": ["chill {genre} playlist", "relaxed {genre} mix", "{genre} to chill to"]
+  },
+  "emotional": {
+    "ko_keywords": ["감성적인", "감성", "감동적인", "애절한", "서정적", "마음을 울리는", "가슴 먹먹한", "울컥하는", "진한", "깊은"],
+    "en_keywords": ["emotional", "heartfelt", "touching", "sentimental", "moving", "deep", "soulful", "tearful", "stirring", "poignant"],
+    "color_tones": ["muted blue", "soft gray", "faded violet", "pale rose"],
+    "visual_concepts": ["rain on window", "empty street at night", "old photograph", "handwritten diary", "single candle"],
+    "title_patterns_ko": ["감성 {genre} 플레이리스트", "마음을 울리는 {genre} 모음", "가슴 먹먹한 {genre}"],
+    "title_patterns_en": ["emotional {genre} playlist", "heartfelt {genre} songs", "{genre} that hits deep"]
+  },
+  "dreamy": {
+    "ko_keywords": ["몽환적인", "몽환", "꿈결 같은", "환상적인", "동화 같은", "신비로운", "흐릿한", "나른하고 몽환적인", "비현실적", "안개 같은"],
+    "en_keywords": ["dreamy", "ethereal", "hazy", "surreal", "whimsical", "floating", "atmospheric", "otherworldly", "misty", "dream-like"],
+    "color_tones": ["pastel purple", "misty blue", "soft pink", "opal white"],
+    "visual_concepts": ["clouds at dusk", "foggy forest", "underwater light", "starry field", "aurora borealis"],
+    "title_patterns_ko": ["몽환적인 {genre} 플레이리스트", "꿈결 같은 {genre} 모음", "비현실적인 {genre}"],
+    "title_patterns_en": ["dreamy {genre} playlist", "ethereal {genre} mix", "floating {genre} vibes"]
+  },
+  "sexy": {
+    "ko_keywords": ["섹시한", "관능적인", "매혹적인", "그루비한", "야릇한", "무드 있는", "도발적인", "치명적인", "유혹적인", "뜨거운"],
+    "en_keywords": ["sexy", "sensual", "seductive", "sultry", "groovy", "provocative", "steamy", "alluring", "magnetic", "smoldering"],
+    "color_tones": ["deep red", "wine burgundy", "dark gold", "black cherry"],
+    "visual_concepts": ["dimly lit lounge", "silk curtains", "city penthouse night", "red neon glow", "velvet texture"],
+    "title_patterns_ko": ["섹시한 {genre} 플레이리스트", "매혹적인 {genre} 모음", "그루비 {genre} 믹스"],
+    "title_patterns_en": ["sexy {genre} playlist", "sensual {genre} mix", "sultry {genre} vibes"]
+  },
+  "energetic": {
+    "ko_keywords": ["에너지 넘치는", "신나는", "파워풀한", "활기찬", "텐션 높은", "업비트", "빠른", "폭발적인", "흥겨운", "강렬한"],
+    "en_keywords": ["energetic", "upbeat", "hype", "powerful", "pumped up", "high energy", "dynamic", "explosive", "intense", "fire"],
+    "color_tones": ["bright red", "electric yellow", "neon orange", "vivid green"],
+    "visual_concepts": ["crowd jumping", "fireworks", "gym workout", "fast car", "lightning bolt"],
+    "title_patterns_ko": ["신나는 {genre} 플레이리스트", "에너지 폭발 {genre} 모음", "텐션 올리는 {genre}"],
+    "title_patterns_en": ["energetic {genre} playlist", "hype {genre} mix", "{genre} to pump you up"]
+  },
+  "romantic": {
+    "ko_keywords": ["로맨틱한", "사랑스러운", "달달한", "설레는", "연인", "사랑 노래", "고백", "심쿵", "두근두근", "감미로운"],
+    "en_keywords": ["romantic", "love songs", "sweet", "tender", "lovey", "affectionate", "heartwarming", "intimate", "dreamy love", "crush"],
+    "color_tones": ["blush pink", "soft rose", "warm peach", "champagne gold"],
+    "visual_concepts": ["couple silhouette sunset", "roses on table", "fairy lights", "handholding", "love letter"],
+    "title_patterns_ko": ["로맨틱 {genre} 플레이리스트", "설레는 {genre} 모음", "달달한 {genre} 듣기"],
+    "title_patterns_en": ["romantic {genre} playlist", "love songs {genre} mix", "sweet {genre} for lovers"]
+  },
+  "dark": {
+    "ko_keywords": ["어두운", "다크", "무거운", "음산한", "으스스한", "먹먹한", "절망적인", "강렬하고 어두운", "그림자", "심연"],
+    "en_keywords": ["dark", "moody", "gloomy", "ominous", "shadowy", "brooding", "sinister", "heavy", "grim", "haunting"],
+    "color_tones": ["pitch black", "dark charcoal", "blood crimson", "deep indigo"],
+    "visual_concepts": ["dark alley", "thunderstorm", "abandoned building", "cracked mirror", "eclipse"],
+    "title_patterns_ko": ["다크 {genre} 플레이리스트", "어둡고 강렬한 {genre} 모음", "심연의 {genre}"],
+    "title_patterns_en": ["dark {genre} playlist", "moody {genre} mix", "{genre} from the shadows"]
+  },
+  "nostalgic": {
+    "ko_keywords": ["향수", "추억", "그리운", "옛날 감성", "레트로", "빈티지", "그때 그 시절", "옛 생각", "돌아가고 싶은", "아련한"],
+    "en_keywords": ["nostalgic", "retro", "throwback", "vintage", "memories", "reminiscent", "old school", "timeless", "classic vibes", "golden era"],
+    "color_tones": ["faded yellow", "sepia brown", "dusty rose", "muted teal"],
+    "visual_concepts": ["old film grain", "sunset highway", "vintage car", "cassette tape", "polaroid scatter"],
+    "title_patterns_ko": ["추억의 {genre} 플레이리스트", "그리운 {genre} 모음", "아련한 {genre} 감성"],
+    "title_patterns_en": ["nostalgic {genre} playlist", "throwback {genre} mix", "vintage {genre} vibes"]
+  },
+  "soft": {
+    "ko_keywords": ["부드러운", "소프트", "포근한", "따뜻한", "살살", "은은한", "가벼운", "말랑한", "솜사탕 같은", "잔잔하고 부드러운"],
+    "en_keywords": ["soft", "gentle", "tender", "warm", "light", "delicate", "airy", "silky", "feathery", "cotton soft"],
+    "color_tones": ["cotton white", "baby pink", "cream yellow", "powder blue"],
+    "visual_concepts": ["morning light curtain", "fluffy clouds", "cotton field", "soft blanket", "tea steam"],
+    "title_patterns_ko": ["부드러운 {genre} 플레이리스트", "포근한 {genre} 모음", "은은한 {genre} 듣기"],
+    "title_patterns_en": ["soft {genre} playlist", "gentle {genre} mix", "{genre} like a warm hug"]
+  },
+  "uplifting": {
+    "ko_keywords": ["기분 좋은", "밝은", "힘이 되는", "긍정적인", "희망적인", "행복한", "기운 나는", "응원", "상쾌한", "설레는"],
+    "en_keywords": ["uplifting", "feel good", "positive", "bright", "hopeful", "inspiring", "motivating", "joyful", "sunny", "cheerful"],
+    "color_tones": ["sunshine yellow", "sky blue", "fresh green", "coral orange"],
+    "visual_concepts": ["sunrise mountain", "open sky", "jumping silhouette", "sunflower field", "rainbow after rain"],
+    "title_patterns_ko": ["기분 좋아지는 {genre} 플레이리스트", "힘이 되는 {genre} 모음", "긍정 에너지 {genre}"],
+    "title_patterns_en": ["uplifting {genre} playlist", "feel good {genre} mix", "{genre} to brighten your day"]
+  },
+  "lonely": {
+    "ko_keywords": ["외로운", "쓸쓸한", "고독한", "혼자인", "텅 빈", "적막한", "공허한", "혼술", "혼자 듣는", "나 혼자"],
+    "en_keywords": ["lonely", "solitary", "lonesome", "alone", "isolated", "melancholic", "desolate", "forlorn", "empty", "solo night"],
+    "color_tones": ["cold gray", "dark navy", "faded indigo", "muted steel"],
+    "visual_concepts": ["empty bench at night", "solo walk city", "window rain reflection", "single streetlight", "lone figure silhouette"],
+    "title_patterns_ko": ["혼자 듣는 {genre} 플레이리스트", "외로운 밤 {genre} 모음", "쓸쓸한 {genre} 감성"],
+    "title_patterns_en": ["lonely night {genre} playlist", "{genre} for solitary moments", "{genre} when you are alone"]
+  },
+  "cinematic": {
+    "ko_keywords": ["시네마틱", "영화 같은", "영화 음악", "장엄한", "스케일 큰", "서사적인", "드라마틱한", "영화 OST 같은", "웅장한", "대서사시"],
+    "en_keywords": ["cinematic", "epic", "film score", "movie soundtrack", "dramatic", "orchestral", "grand", "theatrical", "blockbuster", "score-like"],
+    "color_tones": ["deep bronze", "midnight teal", "dramatic red", "stormy gray"],
+    "visual_concepts": ["wide landscape shot", "dramatic clouds", "silhouette on cliff", "film reel", "spotlight in dark"],
+    "title_patterns_ko": ["시네마틱 {genre} 플레이리스트", "영화 같은 {genre} 모음", "장엄한 {genre} 사운드트랙"],
+    "title_patterns_en": ["cinematic {genre} playlist", "epic {genre} soundtrack", "dramatic {genre} collection"]
+  }
+}

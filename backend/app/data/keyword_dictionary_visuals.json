@@ -1,0 +1,136 @@
+{
+  "thumbnail_layouts": [
+    "center portrait + bold serif title",
+    "left portrait / right text",
+    "full bleed background + overlay text bottom",
+    "split screen with gradient divider",
+    "top text bar + bottom scene image",
+    "diagonal split / image left / solid color right",
+    "minimal center text on blurred background",
+    "collage grid 2x2 with overlay title",
+    "side crop portrait + vertical title",
+    "cinematic widescreen bar + center text"
+  ],
+  "visual_scenes": {
+    "neon_city": {
+      "description": "Neon-lit urban cityscape at night",
+      "keywords": ["neon city", "urban night", "city glow", "skyscraper lights", "rain-soaked street"],
+      "best_for_moods": ["dark", "energetic", "sexy", "cinematic"],
+      "best_for_situations": ["night_drive", "late_night", "party"],
+      "color_palette": ["neon pink", "electric blue", "deep black", "cyan glow"]
+    },
+    "rainy_window": {
+      "description": "Raindrops on glass with blurred city lights behind",
+      "keywords": ["rain window", "raindrops glass", "blurred bokeh", "water droplet", "rainy reflection"],
+      "best_for_moods": ["emotional", "lonely", "nostalgic", "chill"],
+      "best_for_situations": ["rain", "late_night", "breakup"],
+      "color_palette": ["muted blue", "soft gray", "blurred yellow", "wet silver"]
+    },
+    "headphone_girl": {
+      "description": "Person wearing headphones in moody lighting",
+      "keywords": ["headphones", "music listener", "closed eyes", "immersed in music", "portrait earphones"],
+      "best_for_moods": ["chill", "dreamy", "emotional", "lonely"],
+      "best_for_situations": ["study", "late_night", "rain"],
+      "color_palette": ["warm orange", "deep shadow", "soft highlight", "muted tone"]
+    },
+    "sunset_highway": {
+      "description": "Open highway during golden hour with long shadows",
+      "keywords": ["sunset road", "highway golden hour", "open road", "long drive", "vanishing point"],
+      "best_for_moods": ["nostalgic", "dreamy", "uplifting", "chill"],
+      "best_for_situations": ["night_drive", "travel", "sunset"],
+      "color_palette": ["golden orange", "warm amber", "deep purple sky", "silhouette black"]
+    },
+    "cozy_cafe": {
+      "description": "Warm cafe interior with natural light and books",
+      "keywords": ["cafe interior", "coffee shop", "warm light", "bookshelf", "latte art"],
+      "best_for_moods": ["chill", "peaceful", "romantic", "soft"],
+      "best_for_situations": ["cafe", "morning", "study"],
+      "color_palette": ["warm brown", "cream white", "soft wood", "golden light"]
+    },
+    "vintage_room": {
+      "description": "Retro-styled room with vinyl player and warm tones",
+      "keywords": ["vinyl player", "retro room", "vintage poster", "warm lamp", "old speakers"],
+      "best_for_moods": ["nostalgic", "chill", "romantic"],
+      "best_for_situations": ["late_night", "rain", "breakup"],
+      "color_palette": ["sepia", "warm mahogany", "faded cream", "aged gold"]
+    },
+    "ocean_sunset": {
+      "description": "Calm ocean with sun setting on the horizon",
+      "keywords": ["ocean horizon", "beach sunset", "waves golden", "sea calm", "watercolor sky"],
+      "best_for_moods": ["peaceful", "dreamy", "romantic", "nostalgic"],
+      "best_for_situations": ["sunset", "travel", "sleep"],
+      "color_palette": ["coral pink", "soft purple", "ocean teal", "warm gold"]
+    },
+    "dark_studio": {
+      "description": "Moody music studio with equipment and low light",
+      "keywords": ["music studio", "mixing desk", "microphone dark", "LED panel", "recording booth"],
+      "best_for_moods": ["dark", "intense", "cinematic"],
+      "best_for_situations": ["late_night", "workout"],
+      "color_palette": ["matte black", "dim red", "chrome silver", "deep shadow"]
+    },
+    "starry_night": {
+      "description": "Clear night sky full of stars, possibly with mountains",
+      "keywords": ["starry sky", "night stars", "milky way", "mountain silhouette", "cosmos"],
+      "best_for_moods": ["dreamy", "peaceful", "lonely", "cinematic"],
+      "best_for_situations": ["sleep", "late_night", "travel"],
+      "color_palette": ["deep navy", "silver white", "dark purple", "midnight blue"]
+    },
+    "urban_morning": {
+      "description": "City streets in soft early morning light",
+      "keywords": ["morning city", "empty street dawn", "sunrise buildings", "early light", "fresh air"],
+      "best_for_moods": ["uplifting", "peaceful", "soft"],
+      "best_for_situations": ["morning", "walk", "commute"],
+      "color_palette": ["soft peach", "light blue", "warm white", "pale gold"]
+    },
+    "club_lights": {
+      "description": "Dynamic club lighting with laser beams and crowd",
+      "keywords": ["club laser", "dance floor", "strobe lights", "crowd energy", "dj set"],
+      "best_for_moods": ["energetic", "intense", "sexy"],
+      "best_for_situations": ["party", "workout"],
+      "color_palette": ["neon green", "hot magenta", "electric blue", "ultraviolet"]
+    },
+    "forest_mist": {
+      "description": "Misty forest with soft filtered light",
+      "keywords": ["foggy forest", "misty trees", "forest path", "dappled light", "green canopy"],
+      "best_for_moods": ["peaceful", "dreamy", "soft"],
+      "best_for_situations": ["morning", "walk", "study"],
+      "color_palette": ["sage green", "misty white", "soft brown", "pale yellow"]
+    }
+  },
+  "text_overlay_phrases": {
+    "ko": [
+      "지금 이 순간",
+      "오늘 밤",
+      "새벽 감성",
+      "혼자만의 시간",
+      "끝없는 밤",
+      "비 오는 날",
+      "널 생각하며",
+      "이 노래 들어봐",
+      "감성 충전",
+      "나만의 플레이리스트",
+      "그때 그 노래",
+      "밤의 주인공",
+      "커피 한잔과 함께",
+      "달려볼까",
+      "힘내자 오늘도"
+    ],
+    "en": [
+      "feel this moment",
+      "tonight",
+      "midnight mood",
+      "just you and the music",
+      "endless night",
+      "rainy days",
+      "thinking of you",
+      "press play",
+      "vibe check",
+      "my playlist",
+      "those songs",
+      "after dark",
+      "coffee and chill",
+      "lets ride",
+      "keep going"
+    ]
+  }
+}

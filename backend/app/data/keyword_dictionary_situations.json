@@ -1,0 +1,110 @@
+{
+  "night_drive": {
+    "ko_keywords": ["야간 드라이브", "밤 드라이브", "새벽 드라이브", "드라이브 음악", "야간 운전", "밤길 운전", "드라이브 감성", "차 안에서", "밤 도로", "고속도로 밤"],
+    "en_keywords": ["night drive", "late night drive", "midnight cruise", "driving at night", "car ride music", "highway night", "road trip night", "nighttime driving", "cruise music", "after dark drive"],
+    "time_of_day": "night",
+    "visual_concepts": ["highway lights streaking", "dashboard glow", "city skyline from car", "rearview mirror neon", "tunnel lights"],
+    "matching_moods": ["chill", "dreamy", "nostalgic", "dark", "lonely"],
+    "title_patterns_ko": ["밤 드라이브 {genre} 플레이리스트", "새벽 드라이브에 듣는 {genre}", "야간 드라이브 감성 {genre}"],
+    "title_patterns_en": ["night drive {genre} playlist", "{genre} for midnight driving", "late night cruise {genre}"]
+  },
+  "study": {
+    "ko_keywords": ["공부", "공부 음악", "집중", "시험공부", "도서관", "공부할 때", "집중력 높이는", "독서실", "학습", "공부 배경음악"],
+    "en_keywords": ["study", "study music", "focus", "concentration", "studying", "exam prep", "library music", "deep focus", "study session", "brain power"],
+    "time_of_day": "any",
+    "visual_concepts": ["desk lamp books", "library aisle", "notebook pen", "laptop focus", "minimalist desk"],
+    "matching_moods": ["chill", "peaceful", "soft"],
+    "title_patterns_ko": ["공부할 때 듣는 {genre}", "집중력 높이는 {genre} 플레이리스트", "시험기간 {genre} 모음"],
+    "title_patterns_en": ["study {genre} playlist", "{genre} for deep focus", "{genre} to study to"]
+  },
+  "workout": {
+    "ko_keywords": ["운동", "운동 음악", "헬스", "헬스장", "러닝", "달리기", "웨이트", "운동할 때", "짐", "트레이닝"],
+    "en_keywords": ["workout", "gym music", "exercise", "running", "training", "fitness", "pump up", "gym playlist", "cardio", "lifting"],
+    "time_of_day": "any",
+    "visual_concepts": ["dumbbell closeup", "running shoes road", "gym interior", "sweat dripping", "boxing gloves"],
+    "matching_moods": ["energetic", "intense", "uplifting"],
+    "title_patterns_ko": ["운동할 때 듣는 {genre}", "헬스장에서 텐션 올리는 {genre}", "러닝 {genre} 플레이리스트"],
+    "title_patterns_en": ["workout {genre} playlist", "{genre} for the gym", "pump up {genre} mix"]
+  },
+  "cafe": {
+    "ko_keywords": ["카페", "카페 음악", "카페 분위기", "커피숍", "브런치", "카페 배경음악", "아늑한 카페", "카페에서 듣는", "커피 한잔", "티타임"],
+    "en_keywords": ["cafe", "coffee shop", "cafe music", "coffeehouse", "brunch", "cafe ambiance", "cafe vibes", "coffee shop playlist", "tea time", "cozy cafe"],
+    "time_of_day": "morning_to_afternoon",
+    "visual_concepts": ["latte art", "cafe window seat", "bookshelf cafe", "croissant plate", "warm wood interior"],
+    "matching_moods": ["chill", "romantic", "peaceful", "soft"],
+    "title_patterns_ko": ["카페에서 듣기 좋은 {genre}", "카페 분위기 {genre} 플레이리스트", "커피와 함께하는 {genre}"],
+    "title_patterns_en": ["cafe {genre} playlist", "{genre} for coffee shops", "cozy cafe {genre} mix"]
+  },
+  "sleep": {
+    "ko_keywords": ["수면", "수면 음악", "잠잘 때", "자장가", "불면증", "취침", "숙면", "잠들기 전", "편안한 수면", "꿀잠"],
+    "en_keywords": ["sleep", "sleep music", "bedtime", "lullaby", "insomnia", "slumber", "deep sleep", "before bed", "sleep aid", "nighttime relax"],
+    "time_of_day": "night",
+    "visual_concepts": ["moonlit bedroom", "stars through window", "soft pillow", "dim night light", "crescent moon"],
+    "matching_moods": ["peaceful", "soft", "dreamy"],
+    "title_patterns_ko": ["잠잘 때 듣는 {genre}", "수면 {genre} 플레이리스트", "잠들기 전 {genre}"],
+    "title_patterns_en": ["sleep {genre} playlist", "{genre} for bedtime", "deep sleep {genre} mix"]
+  },
+  "rain": {
+    "ko_keywords": ["비 오는 날", "비", "장마", "빗소리", "비 내리는", "우중충한 날", "비 오는 밤", "소나기", "비와 함께", "빗속에서"],
+    "en_keywords": ["rainy day", "rain", "rainy mood", "rain sounds", "rainy night", "downpour", "drizzle", "thunderstorm", "rain and music", "rainy vibes"],
+    "time_of_day": "any",
+    "visual_concepts": ["raindrops on glass", "umbrella in rain", "puddle reflection", "foggy street", "rainy window coffee"],
+    "matching_moods": ["emotional", "nostalgic", "lonely", "chill"],
+    "title_patterns_ko": ["비 오는 날 듣는 {genre}", "빗소리와 함께하는 {genre} 플레이리스트", "장마철 {genre} 모음"],
+    "title_patterns_en": ["rainy day {genre} playlist", "{genre} for rainy nights", "{genre} with rain sounds"]
+  },
+  "breakup": {
+    "ko_keywords": ["이별", "이별 노래", "헤어진 후", "실연", "이별 감성", "이별 후", "눈물", "잊을 수 없는", "보고 싶은", "이별 후 듣는"],
+    "en_keywords": ["breakup", "heartbreak", "after breakup", "broken heart", "moving on", "letting go", "ex", "heartbreak songs", "sad love", "getting over"],
+    "time_of_day": "night",
+    "visual_concepts": ["torn photo", "empty chair", "wilted flower", "rain at bus stop", "fading footprints"],
+    "matching_moods": ["emotional", "sad", "lonely", "dark"],
+    "title_patterns_ko": ["이별 후 듣는 {genre}", "실연 {genre} 플레이리스트", "헤어진 날 듣는 {genre}"],
+    "title_patterns_en": ["breakup {genre} playlist", "{genre} for broken hearts", "heartbreak {genre} collection"]
+  },
+  "morning": {
+    "ko_keywords": ["아침", "아침 음악", "기상", "모닝", "아침 루틴", "상쾌한 아침", "출근 전", "일어나서", "아침 햇살", "좋은 아침"],
+    "en_keywords": ["morning", "morning music", "wake up", "sunrise", "morning routine", "fresh morning", "good morning", "start the day", "dawn", "early morning"],
+    "time_of_day": "morning",
+    "visual_concepts": ["sunrise window", "morning coffee pour", "alarm clock", "golden hour bedroom", "dew on grass"],
+    "matching_moods": ["uplifting", "peaceful", "soft", "happy"],
+    "title_patterns_ko": ["아침에 듣기 좋은 {genre}", "상쾌한 아침 {genre} 플레이리스트", "기상 {genre} 모음"],
+    "title_patterns_en": ["morning {genre} playlist", "{genre} to start your day", "sunrise {genre} mix"]
+  },
+  "sunset": {
+    "ko_keywords": ["노을", "석양", "일몰", "해질녘", "황혼", "노을 감성", "해 지는", "저녁 노을", "하늘빛", "골든아워"],
+    "en_keywords": ["sunset", "golden hour", "dusk", "twilight", "sundown", "evening sky", "sunset vibes", "golden light", "magic hour", "afterglow"],
+    "time_of_day": "evening",
+    "visual_concepts": ["ocean sunset", "rooftop skyline dusk", "silhouette in golden light", "orange sky horizon", "beach bonfire"],
+    "matching_moods": ["nostalgic", "romantic", "dreamy", "chill"],
+    "title_patterns_ko": ["노을 감성 {genre} 플레이리스트", "해질녘 {genre} 모음", "황혼에 듣는 {genre}"],
+    "title_patterns_en": ["sunset {genre} playlist", "golden hour {genre} mix", "{genre} for dusk"]
+  },
+  "party": {
+    "ko_keywords": ["파티", "클럽", "신나는 파티", "파티 음악", "춤", "댄스", "불금", "술자리", "떼창", "파티 플레이리스트"],
+    "en_keywords": ["party", "club", "dance party", "turn up", "party playlist", "night out", "club night", "dance floor", "rave", "bangers"],
+    "time_of_day": "night",
+    "visual_concepts": ["disco ball", "dj booth", "crowd hands up", "neon dance floor", "champagne toast"],
+    "matching_moods": ["energetic", "sexy", "intense", "uplifting"],
+    "title_patterns_ko": ["파티 {genre} 플레이리스트", "클럽에서 터지는 {genre}", "불금 {genre} 모음"],
+    "title_patterns_en": ["party {genre} playlist", "{genre} bangers for the club", "turn up {genre} mix"]
+  },
+  "travel": {
+    "ko_keywords": ["여행", "여행 음악", "로드트립", "비행기", "여행길", "배낭여행", "해외여행", "여행 감성", "떠나고 싶은", "여행 플레이리스트"],
+    "en_keywords": ["travel", "road trip", "adventure", "wanderlust", "traveling", "journey", "explore", "vacation", "nomad", "on the road"],
+    "time_of_day": "any",
+    "visual_concepts": ["airplane window clouds", "open highway", "world map pins", "backpacker mountain", "train window scenery"],
+    "matching_moods": ["uplifting", "nostalgic", "chill", "dreamy"],
+    "title_patterns_ko": ["여행할 때 듣는 {genre}", "로드트립 {genre} 플레이리스트", "떠나고 싶어지는 {genre}"],
+    "title_patterns_en": ["travel {genre} playlist", "{genre} for road trips", "adventure {genre} mix"]
+  },
+  "late_night": {
+    "ko_keywords": ["새벽", "심야", "밤", "늦은 밤", "자정", "야행성", "밤새", "새벽감성", "야심한 시간", "불면의 밤"],
+    "en_keywords": ["late night", "midnight", "after hours", "small hours", "3am", "night owl", "late night vibes", "insomnia night", "nocturnal", "witching hour"],
+    "time_of_day": "late_night",
+    "visual_concepts": ["city skyline midnight", "dimly lit desk", "neon alley", "moon over rooftop", "empty highway 3am"],
+    "matching_moods": ["lonely", "dark", "dreamy", "chill", "cinematic"],
+    "title_patterns_ko": ["새벽에 듣는 {genre}", "늦은 밤 {genre} 플레이리스트", "심야 {genre} 감성"],
+    "title_patterns_en": ["late night {genre} playlist", "{genre} for the midnight hour", "3am {genre} vibes"]
+  }
+}
