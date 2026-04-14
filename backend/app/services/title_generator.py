@@ -365,7 +365,13 @@ def _pick_keywords_hard_filtered(
         kw = ks.keyword
         # genre-anchor 없으면 rewrite 시도
         if is_longtail_set and not has_genre_anchor(kw):
-            kw = rewrite_broad_phrase(kw, _genre_display_cache.get("current", ""))
+            kw = rewrite_broad_phrase(
+                kw,
+                _genre_display_cache.get("current", ""),
+                _rewrite_mood_cache.get("mood_key", ""),
+                _rewrite_mood_cache.get("genre_key", ""),
+                _rewrite_mood_cache.get("situation", ""),
+            )
             if not has_genre_anchor(kw):
                 continue  # rewrite 후에도 anchor 없으면 skip
 
@@ -377,8 +383,9 @@ def _pick_keywords_hard_filtered(
     return result
 
 
-# genre display를 fallback rewrite에 전달하기 위한 임시 캐시
+# rewrite fallback용 임시 캐시
 _genre_display_cache: dict[str, str] = {}
+_rewrite_mood_cache: dict[str, str] = {}  # "mood_key", "genre_key", "situation"
 
 
 def _make_title_pair(
@@ -387,15 +394,17 @@ def _make_title_pair(
     language: str,
     situation: str,
     ensure_specific: bool = False,
+    mood_key: str = "",
+    genre_key: str = "",
 ) -> tuple[str, str]:
     if not kws:
         return "", ""
 
-    # broad phrase rewrite: "노래" → genre name
+    # broad phrase rewrite: "노래" → mood+genre or genre
     rewritten = []
     for kw in kws:
         if not has_genre_anchor(kw):
-            kw = rewrite_broad_phrase(kw, genre)
+            kw = rewrite_broad_phrase(kw, genre, mood_key, genre_key, situation)
         rewritten.append(kw)
 
     genre_lower = genre.lower()
@@ -443,8 +452,11 @@ def generate_title_sets(
     situation = analysis.primary_situation
     genre = _pick_display_keyword(analysis.primary_genre, "genres", language)
 
-    # genre display를 rewrite fallback에서 사용할 수 있도록 캐시
+    # rewrite에서 사용할 수 있도록 캐시
     _genre_display_cache["current"] = genre
+    _rewrite_mood_cache["mood_key"] = analysis.primary_mood
+    _rewrite_mood_cache["genre_key"] = analysis.primary_genre
+    _rewrite_mood_cache["situation"] = situation
 
     # ── 감성형: template 기반 + mood intent hard filter ──
     ytm_pool = _generate_ytm_titles(analysis, language, count=12)
@@ -463,7 +475,10 @@ def generate_title_sets(
         keyword_scores, "search",
         ["mid-tail", "long-tail"], situation, 3,
     )
-    search_ytm, search_ytp = _make_title_pair(search_kws, genre, language, situation)
+    search_ytm, search_ytp = _make_title_pair(
+        search_kws, genre, language, situation,
+        mood_key=analysis.primary_mood, genre_key=analysis.primary_genre,
+    )
 
     # ── 롱테일형: keyword 기반 + utility/creator hard filter ──
     longtail_kws = _pick_keywords_hard_filtered(
@@ -471,7 +486,8 @@ def generate_title_sets(
         ["long-tail", "mid-tail"], situation, 3,
     )
     longtail_ytm, longtail_ytp = _make_title_pair(
-        longtail_kws, genre, language, situation, ensure_specific=True
+        longtail_kws, genre, language, situation, ensure_specific=True,
+        mood_key=analysis.primary_mood, genre_key=analysis.primary_genre,
     )
 
     # ── fallback 준비 ──

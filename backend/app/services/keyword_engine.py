@@ -242,36 +242,141 @@ def genre_anchor_score(keyword: str) -> float:
     """genre/style/mood anchor 보너스 점수. anchor 없고 broad noun만 있으면 패널티."""
     low = keyword.lower()
     score = 0.0
+    has_genre = any(a in low for a in _GENRE_ANCHORS)
+    has_style = any(a in low for a in _STYLE_ANCHORS)
+    has_mood = any(a in low for a in _MOOD_ANCHORS)
 
-    if any(a in low for a in _GENRE_ANCHORS):
+    if has_genre:
         score += 0.10
-    if any(a in low for a in _STYLE_ANCHORS):
+    if has_style:
         score += 0.08
-    if any(a in low for a in _MOOD_ANCHORS):
+    if has_mood:
+        score += 0.05
+    # mood + genre 동시 보유 → 추가 보너스
+    if has_mood and (has_genre or has_style):
         score += 0.05
 
-    # anchor가 전혀 없고 broad noun만 있으면 패널티
     if score == 0.0 and any(b in low for b in _BROAD_NOUNS):
         score -= 0.12
 
     return score
 
 
-def rewrite_broad_phrase(keyword: str, genre_display: str) -> str:
-    """'노래', '음악' 같은 broad noun을 genre_display로 교체."""
-    result = keyword
+# ── Preferred mood+genre pair 사전 ──
+
+_PREFERRED_MOOD_GENRE_PAIRS: dict[str, dict[str, str]] = {
+    # genre_key → {mood_key → "mood_display genre_display"}
+    "pop": {
+        "emotional": "감성 팝", "happy": "청량한 팝", "romantic": "로맨틱 팝",
+        "nostalgic": "추억의 팝", "chill": "차분한 팝", "dreamy": "몽환 팝",
+    },
+    "kpop": {
+        "energetic": "신나는 케이팝", "happy": "밝은 케이팝",
+        "emotional": "감성 케이팝", "intense": "파워풀 케이팝",
+    },
+    "rnb": {
+        "sexy": "섹시한 알앤비", "emotional": "감성 알앤비",
+        "chill": "차분한 알앤비", "dreamy": "몽환 알앤비",
+        "romantic": "로맨틱 알앤비",
+    },
+    "lofi": {
+        "chill": "차분한 로파이", "dreamy": "몽환 로파이",
+        "peaceful": "잔잔한 로파이", "nostalgic": "레트로 로파이",
+    },
+    "jazz": {
+        "chill": "차분한 재즈", "romantic": "로맨틱 재즈",
+        "nostalgic": "빈티지 재즈",
+    },
+    "ballad": {
+        "emotional": "감성 발라드", "sad": "슬픈 발라드",
+        "romantic": "로맨틱 발라드", "nostalgic": "추억의 발라드",
+    },
+    "indie": {
+        "dreamy": "몽환 인디", "nostalgic": "레트로 인디",
+        "chill": "잔잔한 인디",
+    },
+    "hiphop": {
+        "energetic": "신나는 힙합", "dark": "다크 힙합",
+        "intense": "파워풀 힙합",
+    },
+    "rock": {
+        "energetic": "에너지 록", "intense": "파워풀 록",
+        "dark": "다크 록",
+    },
+    "citypop": {
+        "nostalgic": "레트로 시티팝", "dreamy": "몽환 시티팝",
+        "chill": "시티팝 감성",
+    },
+    "acoustic": {
+        "peaceful": "잔잔한 어쿠스틱", "romantic": "로맨틱 어쿠스틱",
+        "chill": "차분한 어쿠스틱",
+    },
+}
+
+# utility가 강한 situation → mood 삽입 제한
+_UTILITY_DOMINANT_SITUATIONS = {"workout", "study", "sleep"}
+
+# utility dominant에서도 허용되는 mood+genre 조합
+_UTILITY_ALLOWED_MOODS: dict[str, set[str]] = {
+    "workout": {"energetic", "intense", "happy"},
+    "study": {"chill", "peaceful", "dreamy"},
+    "sleep": {"peaceful", "dreamy", "chill"},
+}
+
+
+def get_mood_genre_pair(genre_key: str, mood_key: str, situation: str = "") -> str | None:
+    """자연스러운 mood+genre 결합 문자열을 반환. 부자연스러우면 None."""
+    # utility dominant에서 부적합한 mood 차단
+    if situation in _UTILITY_DOMINANT_SITUATIONS:
+        allowed = _UTILITY_ALLOWED_MOODS.get(situation, set())
+        if mood_key not in allowed:
+            return None
+
+    pairs = _PREFERRED_MOOD_GENRE_PAIRS.get(genre_key, {})
+    return pairs.get(mood_key)
+
+
+def rewrite_broad_phrase(
+    keyword: str,
+    genre_display: str,
+    mood_key: str = "",
+    genre_key: str = "",
+    situation: str = "",
+) -> str:
+    """'노래', '음악' 같은 broad noun을 mood+genre 또는 genre로 교체.
+
+    우선순위:
+    1. strong mood + genre 조합 (preferred pair)
+    2. genre only
+    """
+    # 교체할 대상 찾기
+    target_broad = ""
     for broad in ["노래", "음악", "뮤직"]:
-        if broad in result:
-            result = result.replace(broad, genre_display, 1)
+        if broad in keyword:
+            target_broad = broad
             break
-    else:
+    if not target_broad:
         for broad_en in ["songs", "music", "tracks"]:
-            if broad_en in result.lower():
-                # 대소문자 유지하며 교체
-                idx = result.lower().index(broad_en)
-                result = result[:idx] + genre_display + result[idx + len(broad_en):]
+            if broad_en in keyword.lower():
+                target_broad = broad_en
                 break
-    return result
+    if not target_broad:
+        return keyword
+
+    # 1순위: mood+genre pair
+    replacement = genre_display
+    if mood_key and genre_key:
+        pair = get_mood_genre_pair(genre_key, mood_key, situation)
+        if pair:
+            replacement = pair
+
+    # 교체
+    if target_broad in keyword:
+        return keyword.replace(target_broad, replacement, 1)
+
+    # 영어 대소문자 보존
+    idx = keyword.lower().index(target_broad.lower())
+    return keyword[:idx] + replacement + keyword[idx + len(target_broad):]
 
 
 def competition_score(keyword: str) -> float:
