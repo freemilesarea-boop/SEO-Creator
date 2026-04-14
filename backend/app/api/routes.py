@@ -28,6 +28,7 @@ from backend.app.services.keyword_engine import (
 )
 from backend.app.services.title_generator import generate_title_sets
 from backend.app.services.thumbnail_generator import generate_thumbnail
+from backend.app.services.trends_ranker import enhance_with_trends
 from backend.app.models.database import async_session, GenerationHistory
 
 router = APIRouter(prefix="/api/v1", tags=["SEO Generator"])
@@ -57,6 +58,19 @@ def _build_response(
     # 2) 키워드 점수화
     keyword_scores = score_all_keywords(all_keywords, analysis)
 
+    # 2.5) Trends 강화 (실패 시 기존 결과 유지)
+    try:
+        keyword_scores, trend_meta = enhance_with_trends(
+            analysis, keyword_scores, language
+        )
+    except Exception:
+        trend_meta = {
+            "trend_enhanced": False,
+            "trends_source": "error_fallback",
+            "trend_keywords": [],
+            "trend_cache_hit": False,
+        }
+
     # 3) 제목 3세트 생성
     title_sets = generate_title_sets(analysis, keyword_scores, language)
 
@@ -83,9 +97,13 @@ def _build_response(
 
     return GenerationResponse(
         analysis=analysis,
-        keyword_scores=keyword_scores[:15],  # 상위 15개만
+        keyword_scores=keyword_scores[:15],
         results=result_sets,
         generation_id=gen_id,
+        trend_enhanced=trend_meta.get("trend_enhanced", False),
+        trends_source=trend_meta.get("trends_source"),
+        trend_keywords=trend_meta.get("trend_keywords", []),
+        trend_cache_hit=trend_meta.get("trend_cache_hit", False),
     )
 
 

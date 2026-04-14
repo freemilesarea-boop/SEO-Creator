@@ -146,3 +146,8 @@ class GenerationResponse(BaseModel):
     keyword_scores: list[KeywordScore]
     results: list[ResultSet] = Field(description="최소 3세트 결과")
     generation_id: str = Field(description="결과 고유 ID (재생성용)")
+    # Trends 메타
+    trend_enhanced: bool = Field(default=False, description="트렌드 강화 여부")
+    trends_source: str | None = Field(default=None, description="트렌드 데이터 소스")
+    trend_keywords: list[str] = Field(default_factory=list, description="트렌드 키워드 목록")
+    trend_cache_hit: bool = Field(default=False, description="캐시 히트 여부")
