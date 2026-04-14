@@ -10,10 +10,11 @@
     "dev:backend": "cd backend && python3 -m uvicorn app.main:app --host 127.0.0.1 --port 18484 --reload",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:electron": "sleep 5 && ELECTRON_DEV=true electron .",
+    "build:backend": "cd backend && pyinstaller seo-backend.spec --clean --noconfirm",
     "build:frontend": "cd frontend && npm run build",
-    "build:app": "npm run build:frontend && electron-builder",
-    "build:mac": "npm run build:frontend && electron-builder --mac",
-    "build:win": "npm run build:frontend && electron-builder --win",
+    "build:app": "npm run build:backend && npm run build:frontend && electron-builder",
+    "build:mac": "npm run build:backend && npm run build:frontend && electron-builder --mac",
+    "build:win": "npm run build:backend && npm run build:frontend && electron-builder --win",
     "postinstall": "cd frontend && npm install --prefer-offline --no-audit"
   },
   "dependencies": {
@@ -39,13 +40,21 @@
     ],
     "extraResources": [
       {
+        "from": "backend/dist/",
+        "to": "backend-bundle/",
+        "filter": ["seo-backend", "seo-backend.exe"]
+      },
+      {
         "from": "backend",
         "to": "backend-bundle/backend",
         "filter": [
           "**/*",
           "!**/__pycache__/**",
           "!**/*.pyc",
-          "!**/*.db"
+          "!**/*.db",
+          "!dist/**",
+          "!build/**",
+          "!*.spec"
         ]
       }
     ],

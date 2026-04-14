@@ -155,6 +155,23 @@ function _logDirContents(dir, label, depth = 0) {
   }
 }
 
+// ── 번들 바이너리 경로 탐색 ──
+
+function _findBundledBinary(resourcesPath) {
+  const binName = process.platform === "win32" ? "seo-backend.exe" : "seo-backend";
+  const candidates = [
+    path.join(resourcesPath, "backend-bundle", binName),
+    path.join(resourcesPath, binName),
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p)) {
+      _log(`Found bundled binary: ${p}`);
+      return p;
+    }
+  }
+  return null;
+}
+
 // ── 백엔드 시작 ──
 
 function startBackend(port, isPackaged, appPath) {
@@ -165,64 +182,61 @@ function startBackend(port, isPackaged, appPath) {
   _log(`appPath: ${appPath}`);
   _log(`resourcesPath: ${process.resourcesPath}`);
 
-  // CWD 결정
-  let backendCwd;
+  let cmd, args, cwd;
+
   if (isPackaged) {
-    // extraResources: backend → backend-bundle/backend
-    // CWD는 backend-bundle (backend 패키지가 하위에 있음)
-    backendCwd = path.join(process.resourcesPath, "backend-bundle");
-  } else {
-    backendCwd = appPath || path.join(__dirname, "..");
-  }
+    // 1순위: 번들 바이너리 (seo-backend / seo-backend.exe)
+    const binary = _findBundledBinary(process.resourcesPath);
+    if (binary) {
+      _log(`MODE: BUNDLED BINARY`);
+      cmd = binary;
+      args = ["--host", "127.0.0.1", "--port", String(port)];
+      cwd = path.dirname(binary);
 
-  _log(`Computed CWD: ${backendCwd}`);
-
-  // CWD 존재 확인
-  if (!fs.existsSync(backendCwd)) {
-    _log(`ERROR: CWD does not exist: ${backendCwd}`);
-    _log(`Listing resourcesPath:`);
-    _logDirContents(process.resourcesPath, "resources");
-    return;
-  }
-
-  _logDirContents(backendCwd, "CWD contents");
-
-  // main.py 확인
-  const mainPy = path.join(backendCwd, "backend", "app", "main.py");
-  if (!fs.existsSync(mainPy)) {
-    _log(`ERROR: main.py not found at ${mainPy}`);
-    // 구조 문제 진단
-    const altPaths = [
-      path.join(backendCwd, "app", "main.py"),
-      path.join(process.resourcesPath, "backend", "app", "main.py"),
-    ];
-    for (const alt of altPaths) {
-      if (fs.existsSync(alt)) {
-        _log(`FOUND at alternate path: ${alt}`);
+      // 실행 권한 확인 (macOS/Linux)
+      if (process.platform !== "win32") {
+        try { fs.chmodSync(binary, 0o755); } catch (_) {}
       }
+    } else {
+      // 2순위: Python + extraResources 소스
+      _log(`MODE: PACKAGED PYTHON (no binary found)`);
+      const backendCwd = path.join(process.resourcesPath, "backend-bundle");
+      if (!fs.existsSync(backendCwd)) {
+        _log(`ERROR: ${backendCwd} not found`);
+        _logDirContents(process.resourcesPath, "resources");
+        return;
+      }
+      _logDirContents(backendCwd, "backend-bundle");
+
+      const mainPy = path.join(backendCwd, "backend", "app", "main.py");
+      if (!fs.existsSync(mainPy)) {
+        _log(`ERROR: main.py not found at ${mainPy}`);
+        return;
+      }
+
+      const pythonCmd = findPython();
+      cmd = pythonCmd;
+      args = ["-m", "uvicorn", "backend.app.main:app", "--host", "127.0.0.1", "--port", String(port)];
+      cwd = backendCwd;
     }
-    return;
+  } else {
+    // 개발 모드: Python 직접 실행
+    _log(`MODE: DEVELOPMENT`);
+    const devCwd = appPath || path.join(__dirname, "..");
+    const pythonCmd = findPython();
+    cmd = pythonCmd;
+    args = ["-m", "uvicorn", "backend.app.main:app", "--host", "127.0.0.1", "--port", String(port)];
+    cwd = devCwd;
   }
-  _log(`main.py: OK`);
 
-  // Python 찾기
-  const pythonCmd = findPython();
-  _log(`Using Python: ${pythonCmd}`);
-
-  const args = [
-    "-m", "uvicorn",
-    "backend.app.main:app",
-    "--host", "127.0.0.1",
-    "--port", String(port),
-  ];
-
-  _log(`Full command: ${pythonCmd} ${args.join(" ")}`);
-  _log(`Working dir: ${backendCwd}`);
+  _log(`Command: ${cmd}`);
+  _log(`Args: ${args.join(" ")}`);
+  _log(`CWD: ${cwd}`);
 
   // spawn
   try {
-    backendProcess = spawn(pythonCmd, args, {
-      cwd: backendCwd,
+    backendProcess = spawn(cmd, args, {
+      cwd: cwd,
       stdio: ["ignore", "pipe", "pipe"],
       windowsHide: true,
       env: {

@@ -36,8 +36,29 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install Python dependencies
-        run: pip install -r backend/requirements.txt
+      - name: Install Python dependencies + PyInstaller
+        run: |
+          pip install -r backend/requirements.txt
+          pip install pyinstaller
+
+      - name: Build backend binary (PyInstaller)
+        shell: bash
+        run: |
+          cd backend
+          pyinstaller seo-backend.spec --clean --noconfirm
+          echo "--- Backend binary ---"
+          ls -la dist/
+
+      - name: Verify backend binary
+        shell: bash
+        run: |
+          if [ -f backend/dist/seo-backend ] || [ -f backend/dist/seo-backend.exe ]; then
+            echo "Backend binary OK"
+          else
+            echo "ERROR: Backend binary not found"
+            ls -laR backend/dist/ || true
+            exit 1
+          fi
 
       - name: Install root dependencies
         run: npm ci
