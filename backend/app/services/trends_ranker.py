@@ -16,7 +16,11 @@ from backend.app.services.trends_client import (
     generate_seed_keywords,
     query_trends_multi,
 )
-from backend.app.services.keyword_engine import score_keyword
+from backend.app.services.keyword_engine import (
+    score_keyword,
+    classify_keyword,
+    competition_score,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -35,19 +39,26 @@ def _is_spam(keyword: str) -> bool:
     return any(s in low for s in _SPAM_FRAGMENTS)
 
 
-def _brevity_bonus(keyword: str) -> float:
-    """짧고 명확한 키워드에 가산점. 제목 앞부분에 넣기 좋은 길이."""
-    words = keyword.split()
-    if 2 <= len(words) <= 4:
+def _long_tail_bonus(keyword: str) -> float:
+    """long-tail 키워드에 가산점. 구체적일수록 유리."""
+    kw_type = classify_keyword(keyword)
+    if kw_type == "long-tail":
+        return 0.15
+    if kw_type == "mid-tail":
         return 0.08
-    if len(words) == 1 and len(keyword) <= 10:
-        return 0.04
-    return 0.0
+    return 0.0  # head
+
+
+def _low_competition_bonus(keyword: str) -> float:
+    """경쟁도가 낮을수록 가산점."""
+    comp = competition_score(keyword)
+    # 경쟁도 0.0 → 보너스 0.12, 경쟁도 1.0 → 보너스 0.0
+    return round((1.0 - comp) * 0.12, 3)
 
 
 def _rising_bonus(query_type: str) -> float:
     """rising 검색어에 가산점."""
-    return 0.06 if query_type == "rising" else 0.0
+    return 0.05 if query_type == "rising" else 0.0
 
 
 # ── 핵심: Trends 강화 재점수화 ──
@@ -129,14 +140,13 @@ def enhance_with_trends(
         trend_score = trend_kw_map.get(ks.keyword.lower(), 0.0)
         query_type = trend_type_map.get(ks.keyword.lower(), "none")
 
-        # 병합 공식
+        # 새 공식: trend + internal + long_tail + low_competition
         new_total = (
-            ks.relevance * 0.45
-            + trend_score * 0.35
-            + ks.mood_match * 0.10
-            + ks.genre_match * 0.10
+            trend_score * 0.35
+            + ks.relevance * 0.30
+            + _long_tail_bonus(ks.keyword)
+            + _low_competition_bonus(ks.keyword)
             + _rising_bonus(query_type)
-            + _brevity_bonus(ks.keyword)
         )
         new_total = max(0.0, min(1.0, new_total))
 
@@ -146,7 +156,7 @@ def enhance_with_trends(
             search_intent=round(max(ks.search_intent, trend_score), 3),
             mood_match=ks.mood_match,
             genre_match=ks.genre_match,
-            spam_risk=ks.spam_risk,
+            spam_risk=round(competition_score(ks.keyword), 3),
             total_score=round(new_total, 3),
         ))
 
@@ -157,16 +167,14 @@ def enhance_with_trends(
             trend_score = q.get("score", 0.5)
             query_type = q.get("type", "top")
 
-            # 기본 internal score 산정
             base_ks = score_keyword(q["keyword"], analysis)
 
             new_total = (
-                base_ks.relevance * 0.45
-                + trend_score * 0.35
-                + base_ks.mood_match * 0.10
-                + base_ks.genre_match * 0.10
+                trend_score * 0.35
+                + base_ks.relevance * 0.30
+                + _long_tail_bonus(q["keyword"])
+                + _low_competition_bonus(q["keyword"])
                 + _rising_bonus(query_type)
-                + _brevity_bonus(q["keyword"])
             )
             new_total = max(0.0, min(1.0, new_total))
 
@@ -176,7 +184,7 @@ def enhance_with_trends(
                 search_intent=round(trend_score, 3),
                 mood_match=base_ks.mood_match,
                 genre_match=base_ks.genre_match,
-                spam_risk=base_ks.spam_risk,
+                spam_risk=round(competition_score(q["keyword"]), 3),
                 total_score=round(new_total, 3),
             ))
 

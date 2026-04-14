@@ -15,6 +15,7 @@ from backend.app.services.coherence import (
     pick_compatible_mood,
     is_title_consistent,
 )
+from backend.app.services.keyword_engine import classify_keyword
 
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 _dict_cache: dict | None = None
@@ -197,57 +198,47 @@ def _generate_ytp_titles(
 # ── 3세트 이상 결과 생성 ──
 
 
-def _generate_trend_titles(
-    analysis: AnalysisResult,
+def _pick_by_type(
     keyword_scores: list[KeywordScore],
-    language: str,
-) -> tuple[str, str]:
-    """Trend 키워드 기반 제목 쌍(YTM, YTP)을 생성.
-    search_intent가 높은 키워드를 제목 앞부분에 배치."""
-    # search_intent 기준 상위 키워드 (trend 반영된 것)
-    top_kws = sorted(keyword_scores, key=lambda k: k.search_intent, reverse=True)
-    trend_kws = [k.keyword for k in top_kws if k.search_intent >= 0.7][:3]
+    target_type: str,
+    situation: str,
+    count: int = 3,
+) -> list[str]:
+    """특정 keyword type의 키워드를 점수 순으로 추출."""
+    candidates = [
+        ks for ks in keyword_scores
+        if classify_keyword(ks.keyword) == target_type
+        and is_title_consistent(situation, ks.keyword)
+    ]
+    candidates.sort(key=lambda k: k.total_score, reverse=True)
+    return [c.keyword for c in candidates[:count]]
 
-    if not trend_kws:
+
+def _make_title_pair(
+    kws: list[str],
+    genre: str,
+    language: str,
+    situation: str,
+) -> tuple[str, str]:
+    """키워드 리스트로부터 YTM/YTP 제목 쌍을 만든다."""
+    if not kws:
         return "", ""
 
-    d = _load_dictionary()
-    genre = _pick_display_keyword(analysis.primary_genre, "genres", language)
-
     genre_lower = genre.lower()
+    ytm = kws[0]
 
-    if language == "ko":
-        ytm = trend_kws[0] if len(trend_kws[0].split()) <= 5 else trend_kws[0][:20]
-        # genre가 이미 키워드에 포함되면 중복 방지
-        if genre_lower in trend_kws[0].lower():
-            ytp = f"{trend_kws[0]} 플레이리스트"
-        else:
-            ytp = f"{trend_kws[0]} | {genre} 플레이리스트"
-        if len(trend_kws) > 1:
-            kw2 = trend_kws[1]
-            if genre_lower in kw2.lower():
-                ytp = f"{trend_kws[0]} | {kw2}"
-            else:
-                ytp = f"{trend_kws[0]} | {kw2}"
+    if genre_lower in kws[0].lower():
+        ytp = f"{kws[0]} 플레이리스트" if language == "ko" else f"{kws[0]} playlist"
     else:
-        ytm = trend_kws[0]
-        if genre_lower in trend_kws[0].lower():
-            ytp = f"{trend_kws[0]} playlist"
-        else:
-            ytp = f"{trend_kws[0]} | {genre} playlist"
-        if len(trend_kws) > 1:
-            kw2 = trend_kws[1]
-            if genre_lower in kw2.lower():
-                ytp = f"{trend_kws[0]} – {kw2}"
-            else:
-                ytp = f"{trend_kws[0]} – {kw2} {genre} mix"
+        ytp = f"{kws[0]} | {genre} 플레이리스트" if language == "ko" else f"{kws[0]} | {genre} playlist"
 
-    # consistency check
-    if not is_title_consistent(analysis.primary_situation, ytm):
+    if len(kws) > 1:
+        ytp = f"{kws[0]} | {kws[1]}"
+
+    if not is_title_consistent(situation, ytm):
         ytm = ""
-    if not is_title_consistent(analysis.primary_situation, ytp):
+    if not is_title_consistent(situation, ytp):
         ytp = ""
-
     return ytm, ytp
 
 
@@ -257,20 +248,39 @@ def generate_title_sets(
     language: str = "ko",
 ) -> list[dict]:
     """
-    최소 3세트의 제목 조합을 생성한다.
-
-    세트 유형:
-    - 감성형: 분위기·감성 키워드 강조
-    - 검색형: SEO 검색 키워드 강조 (trend 키워드 우선)
-    - 클릭형: 클릭 유도 자연어형
+    3세트 제목 생성:
+    - 감성형: 분위기·감성 키워드 (template 기반)
+    - 검색형: mid-tail 키워드 우선 (trend 반영)
+    - 롱테일형: long-tail 키워드 (low competition)
     """
     ytm_pool = _generate_ytm_titles(analysis, language, count=9)
     ytp_pool = _generate_ytp_titles(analysis, language, count=9)
 
-    # Trend 기반 제목 생성 (검색형 세트에 사용)
-    trend_ytm, trend_ytp = _generate_trend_titles(
-        analysis, keyword_scores, language
-    )
+    genre = _pick_display_keyword(analysis.primary_genre, "genres", language)
+    situation = analysis.primary_situation
+
+    # mid-tail 제목 (검색형)
+    mid_kws = _pick_by_type(keyword_scores, "mid-tail", situation, 3)
+    if not mid_kws:
+        # fallback: non-head 키워드
+        non_head = [
+            ks for ks in sorted(keyword_scores, key=lambda k: k.total_score, reverse=True)
+            if classify_keyword(ks.keyword) != "head"
+            and is_title_consistent(situation, ks.keyword)
+        ]
+        mid_kws = [k.keyword for k in non_head[:3]]
+    mid_ytm, mid_ytp = _make_title_pair(mid_kws, genre, language, situation)
+
+    # long-tail 제목 (롱테일형)
+    long_kws = _pick_by_type(keyword_scores, "long-tail", situation, 3)
+    if not long_kws:
+        all_sorted = sorted(keyword_scores, key=lambda k: len(k.keyword), reverse=True)
+        long_kws = [
+            k.keyword for k in all_sorted
+            if classify_keyword(k.keyword) != "head"
+            and is_title_consistent(situation, k.keyword)
+        ][:3]
+    long_ytm, long_ytp = _make_title_pair(long_kws, genre, language, situation)
 
     # 풀이 부족하면 채움
     while len(ytm_pool) < 3:
@@ -278,28 +288,31 @@ def generate_title_sets(
     while len(ytp_pool) < 3:
         ytp_pool.append(ytp_pool[0] if ytp_pool else "플레이리스트 모음")
 
-    set_labels = [
-        ("감성형", "Emotional") if language == "ko" else ("Emotional", "Emotional"),
-        ("검색형", "Search-Optimized") if language == "ko" else ("Search-Optimized", "Search-Optimized"),
-        ("클릭형", "Click-Optimized") if language == "ko" else ("Click-Optimized", "Click-Optimized"),
-    ]
+    set_labels_ko = ["감성형", "검색형", "롱테일형"]
+    set_labels_en = ["Emotional", "Search-Optimized", "Long-Tail"]
+    labels = set_labels_ko if language == "ko" else set_labels_en
 
     results: list[dict] = []
-    for i, (label_ko, _label_en) in enumerate(set_labels):
-        ytm = ytm_pool[i] if i < len(ytm_pool) else ytm_pool[-1]
-        ytp = ytp_pool[i] if i < len(ytp_pool) else ytp_pool[-1]
 
-        # 검색형 세트에 trend 제목 우선 적용
-        if i == 1:  # 검색형
-            if trend_ytm:
-                ytm = trend_ytm
-            if trend_ytp:
-                ytp = trend_ytp
+    # 1번: 감성형 (template 기반)
+    results.append({
+        "set_label": labels[0],
+        "yt_music_title": ytm_pool[0],
+        "yt_playlist_title": ytp_pool[0],
+    })
 
-        results.append({
-            "set_label": label_ko,
-            "yt_music_title": ytm,
-            "yt_playlist_title": ytp,
-        })
+    # 2번: 검색형 (mid-tail)
+    results.append({
+        "set_label": labels[1],
+        "yt_music_title": mid_ytm or ytm_pool[1],
+        "yt_playlist_title": mid_ytp or ytp_pool[1],
+    })
+
+    # 3번: 롱테일형 (low competition)
+    results.append({
+        "set_label": labels[2],
+        "yt_music_title": long_ytm or ytm_pool[2],
+        "yt_playlist_title": long_ytp or ytp_pool[2],
+    })
 
     return results

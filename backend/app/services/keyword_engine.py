@@ -109,11 +109,132 @@ def generate_combination_keywords(analysis: AnalysisResult) -> list[str]:
     return list(dict.fromkeys(combos))  # 중복 제거
 
 
+# ── 키워드 유형 분류 ──
+
+
+_GENERIC_HEAD_WORDS = {
+    "노래", "음악", "추천", "모음", "플레이리스트", "듣기",
+    "songs", "music", "playlist", "mix", "best", "top",
+    "팝송", "노래 추천", "음악 추천",
+}
+
+
+def classify_keyword(keyword: str) -> str:
+    """키워드를 head / mid-tail / long-tail로 분류.
+
+    - head: 1~2어절 또는 너무 범용적
+    - mid-tail: 3~4어절, 장르+상황 조합
+    - long-tail: 5어절 이상, 구체적 use-case 포함
+    """
+    words = keyword.split()
+    word_count = len(words)
+    low = keyword.lower()
+
+    # 영어 1~2 단어 단독 = head
+    if word_count <= 2:
+        return "head"
+
+    # 너무 범용적인 단어로만 구성
+    generic_count = sum(1 for w in words if w in _GENERIC_HEAD_WORDS)
+    if generic_count >= word_count - 1:
+        return "head"
+
+    # 한국어 글자 수 기반 보조 판단
+    char_count = len(keyword.replace(" ", ""))
+    if char_count <= 6:
+        return "head"
+
+    if word_count >= 5 or char_count >= 18:
+        return "long-tail"
+
+    return "mid-tail"
+
+
+def competition_score(keyword: str) -> float:
+    """경쟁도 추정 (0=낮음/좋음, 1=높음/나쁨).
+
+    높은 값 = 경쟁 치열 = 패널티 대상
+    """
+    kw_type = classify_keyword(keyword)
+    low = keyword.lower()
+
+    score = 0.0
+
+    # 유형별 기본 경쟁도
+    if kw_type == "head":
+        score = 0.8
+    elif kw_type == "mid-tail":
+        score = 0.4
+    else:  # long-tail
+        score = 0.15
+
+    # 범용 단어가 많으면 경쟁 up
+    words = keyword.split()
+    generic_count = sum(1 for w in words if w in _GENERIC_HEAD_WORDS)
+    score += generic_count * 0.1
+
+    # 너무 짧으면 경쟁 up
+    if len(keyword.replace(" ", "")) <= 8:
+        score += 0.15
+
+    return min(1.0, score)
+
+
 # ── 롱테일 키워드 ──
 
 
+_LONGTAIL_KO_TEMPLATES = [
+    "{m} {g} 추천",
+    "{s} {g} 노래 모음",
+    "{s} 분위기에 딱 맞는 {g} 플레이리스트",
+    "{m} 느낌의 {g} 노래 추천",
+    "{s} 분위기 {g} 모음",
+    "{m} {g} | {s} 플레이리스트",
+]
+
+_LONGTAIL_EN_TEMPLATES = [
+    "{m} {g} for {s}",
+    "best {m} {g} playlist",
+    "{g} songs for {s}",
+    "{m} {g} mix for {s}",
+    "{g} playlist for {s} – {m} vibes",
+    "the best {g} to listen during {s}",
+    "{m} {g} collection | perfect for {s}",
+    "{g} you need for {s} | {m} edition",
+    "{s} {g} playlist – {m} and chill",
+    "top {m} {g} tracks for your {s}",
+]
+
+# situation별 구체적 context 키워드
+_SITUATION_CONTEXTS_KO: dict[str, list[str]] = {
+    "workout": ["헬스장에서", "러닝할 때", "운동할 때", "웨이트할 때"],
+    "study": ["공부할 때", "도서관에서", "시험기간에", "집중할 때"],
+    "night_drive": ["밤 드라이브할 때", "야간 운전할 때", "새벽 드라이브에서"],
+    "cafe": ["카페에서", "커피숍에서", "카페 배경음악으로"],
+    "sleep": ["잠잘 때", "자기 전에", "수면용으로"],
+    "rain": ["비 오는 날에", "비 오는 밤에", "장마철에"],
+    "late_night": ["새벽에", "밤에 혼자", "심야에"],
+    "morning": ["아침에", "기상할 때", "출근 전에"],
+    "party": ["파티할 때", "클럽에서", "불금에"],
+    "walk": ["산책할 때", "걸을 때", "조깅할 때"],
+    "commute": ["출퇴근할 때", "지하철에서", "버스에서"],
+}
+
+_SITUATION_CONTEXTS_EN: dict[str, list[str]] = {
+    "workout": ["at the gym", "while running", "during training"],
+    "study": ["while studying", "at the library", "during exam prep"],
+    "night_drive": ["on a late night drive", "driving at midnight"],
+    "cafe": ["at a coffee shop", "cafe background music"],
+    "sleep": ["before bed", "for deep sleep"],
+    "rain": ["on a rainy day", "rainy night"],
+    "late_night": ["at 3am", "late at night"],
+    "morning": ["in the morning", "to start your day"],
+    "party": ["at the party", "club night"],
+}
+
+
 def generate_longtail_keywords(analysis: AnalysisResult) -> list[str]:
-    """긴 꼬리 검색어 생성 (자연어형)."""
+    """구체적 use-case 기반 long-tail 검색어 생성."""
     lang = analysis.language
     genre = analysis.primary_genre
     mood = analysis.primary_mood
@@ -127,23 +248,36 @@ def generate_longtail_keywords(analysis: AnalysisResult) -> list[str]:
     m = m_kw[0] if m_kw else mood
     s = s_kw[0] if s_kw else situation
 
+    results: list[str] = []
+
     if lang == "ko":
-        templates = [
-            f"{s} 때 듣기 좋은 {g}",
-            f"{m} {g} 플레이리스트",
-            f"{s} {m} {g} 모음",
-            f"{m} 느낌의 {g} 노래",
-            f"{s} 분위기 {g}",
-        ]
+        for tmpl in _LONGTAIL_KO_TEMPLATES:
+            results.append(tmpl.format(g=g, m=m, s=s))
+        # situation-specific context → 자연어 long-tail 핵심
+        contexts = _SITUATION_CONTEXTS_KO.get(situation, [])
+        for ctx in contexts:
+            results.append(f"{ctx} 듣기 좋은 {g}")
+            results.append(f"{ctx} 듣는 {m} {g} 모음")
+            results.append(f"{ctx} 듣기 좋은 {g} 플레이리스트")
+            results.append(f"{ctx} 분위기 미치는 {g}")
     else:
-        templates = [
-            f"{m} {g} for {s}",
-            f"best {m} {g} playlist",
-            f"{g} songs for {s}",
-            f"{m} {g} mix",
-            f"{s} vibes {g}",
-        ]
-    return templates
+        for tmpl in _LONGTAIL_EN_TEMPLATES:
+            results.append(tmpl.format(g=g, m=m, s=s))
+        contexts = _SITUATION_CONTEXTS_EN.get(situation, [])
+        for ctx in contexts:
+            results.append(f"{g} playlist {ctx}")
+            results.append(f"best {m} {g} {ctx}")
+            results.append(f"{m} {g} songs {ctx}")
+
+    # 중복 제거
+    seen: set[str] = set()
+    unique: list[str] = []
+    for r in results:
+        if r.lower() not in seen:
+            seen.add(r.lower())
+            unique.append(r)
+
+    return unique
 
 
 # ── SEO 점수 산정 ──
