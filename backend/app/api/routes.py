@@ -155,7 +155,9 @@ async def generate_from_link(req: LinkInput):
 async def generate_from_manual(req: ManualInput):
     """수동 입력 기반 생성"""
     # 수동 입력 → AnalysisResult 직접 구성
-    keyword_pool: list[str] = []
+    keyword_pool: list[str] = [
+        req.genre.value, req.mood.value, req.situation.value,
+    ]
     if req.emotion:
         keyword_pool.append(req.emotion)
     keyword_pool.extend(req.reference_artists)

@@ -149,6 +149,39 @@ def generate_longtail_keywords(analysis: AnalysisResult) -> list[str]:
 # ── SEO 점수 산정 ──
 
 
+def _get_display_names(analysis: AnalysisResult) -> set[str]:
+    """language_variants에서 genre/mood/situation의 표시명을 수집한다."""
+    d = _load_dictionary()
+    names: set[str] = set()
+    lang = analysis.language if analysis.language in ("ko", "en") else "ko"
+
+    lv = d.get("language_variants", {}).get(lang, {})
+
+    gd = lv.get("genre_display", {})
+    if analysis.primary_genre in gd:
+        names.add(gd[analysis.primary_genre].lower())
+    md = lv.get("mood_display", {})
+    if analysis.primary_mood in md:
+        names.add(md[analysis.primary_mood].lower())
+    sd = lv.get("situation_display", {})
+    if analysis.primary_situation in sd:
+        names.add(sd[analysis.primary_situation].lower())
+
+    # ko_keywords 첫 번째 값도 추가
+    for section, key in [
+        ("genres", analysis.primary_genre),
+        ("moods", analysis.primary_mood),
+        ("situations", analysis.primary_situation),
+    ]:
+        entry = d.get(section, {}).get(key, {})
+        for kw in entry.get("ko_keywords", [])[:2]:
+            names.add(kw.lower())
+        for kw in entry.get("en_keywords", [])[:2]:
+            names.add(kw.lower())
+
+    return names
+
+
 def _relevance_score(keyword: str, analysis: AnalysisResult) -> float:
     """키워드가 분석 결과와 얼마나 관련 있는지 0~1 점수."""
     low = keyword.lower()
@@ -157,13 +190,23 @@ def _relevance_score(keyword: str, analysis: AnalysisResult) -> float:
 
     if low in pool_lower:
         score += 0.4
-    # 장르/무드/상황 직접 언급
+
+    # 장르/무드/상황 직접 언급 (영문 enum)
     if analysis.primary_genre.lower() in low:
         score += 0.2
     if analysis.primary_mood.lower() in low:
         score += 0.2
     if analysis.primary_situation.replace("_", " ").lower() in low:
         score += 0.2
+
+    # 한국어/영어 표시명 매칭
+    if score < 0.6:
+        display_names = _get_display_names(analysis)
+        for name in display_names:
+            if name in low or low in name:
+                score += 0.3
+                break
+
     return min(score, 1.0)
 
 
@@ -195,18 +238,40 @@ def score_keyword(keyword: str, analysis: AnalysisResult) -> KeywordScore:
     relevance = _relevance_score(keyword, analysis)
     search_intent = _search_intent_score(keyword)
 
-    # 무드/장르 매치는 relevance 에 포함되므로 별도 가중
+    # 무드/장르 매치 – enum 영문 + 한국어 표시명 모두 검사
     mood_match = 0.0
     genre_match = 0.0
     low = keyword.lower()
+    display_names = _get_display_names(analysis)
+
     for m in analysis.detected_moods:
         if m.lower() in low:
             mood_match = 1.0
             break
+    if mood_match == 0.0:
+        d = _load_dictionary()
+        for m in analysis.detected_moods:
+            for kw in d.get("moods", {}).get(m, {}).get("ko_keywords", [])[:3]:
+                if kw.lower() in low or low in kw.lower():
+                    mood_match = 0.8
+                    break
+            if mood_match > 0:
+                break
+
     for g in analysis.detected_genres:
         if g.lower() in low:
             genre_match = 1.0
             break
+    if genre_match == 0.0:
+        d = _load_dictionary()
+        for g in analysis.detected_genres:
+            for kw in d.get("genres", {}).get(g, {}).get("ko_keywords", [])[:3]:
+                if kw.lower() in low or low in kw.lower():
+                    genre_match = 0.8
+                    break
+            if genre_match > 0:
+                break
+
     if mood_match == 0.0:
         mood_match = 0.3 if relevance > 0.3 else 0.1
     if genre_match == 0.0:
