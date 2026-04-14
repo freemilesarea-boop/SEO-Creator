@@ -174,12 +174,13 @@ function _findBundledBinary(resourcesPath) {
 
 // ── 백엔드 시작 ──
 
-function startBackend(port, isPackaged, appPath) {
+function startBackend(port, isPackaged, appPath, userDataPath) {
   if (backendProcess) return;
 
   _log(`--- startBackend ---`);
   _log(`isPackaged: ${isPackaged}`);
   _log(`appPath: ${appPath}`);
+  _log(`userDataPath: ${userDataPath}`);
   _log(`resourcesPath: ${process.resourcesPath}`);
 
   let cmd, args, cwd;
@@ -232,6 +233,7 @@ function startBackend(port, isPackaged, appPath) {
   _log(`Command: ${cmd}`);
   _log(`Args: ${args.join(" ")}`);
   _log(`CWD: ${cwd}`);
+  _log(`DB dir (SEO_CREATOR_APPDATA_DIR): ${userDataPath || "(not set)"}`);
 
   // spawn
   try {
@@ -243,6 +245,7 @@ function startBackend(port, isPackaged, appPath) {
         ...process.env,
         PYTHONDONTWRITEBYTECODE: "1",
         PYTHONUNBUFFERED: "1",
+        SEO_CREATOR_APPDATA_DIR: userDataPath || "",
       },
     });
   } catch (err) {

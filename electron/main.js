@@ -90,13 +90,13 @@ code { background:#27272a; padding:2px 6px; border-radius:4px; font-size:11px; c
   word-break:break-all; font-family:monospace; border:1px solid #27272a; }
 .path { font-size:11px; color:#71717a; margin-top:8px; }
 </style></head><body>
-<h1>백엔드 시작 실패</h1>
+<h1>앱 내부 서버 시작 실패</h1>
 <div class="msg">${escaped(errorMsg)}</div>
-<div class="hint">확인 사항:</div>
+<div class="hint">해결 방법:</div>
 <div class="msg">
-  1. Python 3.11+ 설치: <code>python3 --version</code><br/>
-  2. pip 패키지 설치: <code>pip3 install fastapi uvicorn pydantic pydantic-settings yt-dlp httpx sqlalchemy aiosqlite</code><br/>
-  3. 포트 18484 사용 중인지 확인: <code>lsof -i :18484</code>
+  1. 앱을 완전히 종료 후 다시 실행해 주세요.<br/>
+  2. 다른 프로그램이 포트 18484를 사용 중인지 확인해 주세요.<br/>
+  3. 문제가 지속되면 아래 로그 파일을 첨부하여 지원팀에 문의해 주세요.
 </div>
 <div class="hint">최근 로그:</div>
 <div class="logbox">${escaped(logTail)}</div>
@@ -156,7 +156,8 @@ app.on("ready", async () => {
   const splash = createSplashWindow();
 
   try {
-    startBackend(BACKEND_PORT, app.isPackaged, app.getAppPath());
+    const userDataPath = app.getPath("userData");
+    startBackend(BACKEND_PORT, app.isPackaged, app.getAppPath(), userDataPath);
     await waitForBackend(BACKEND_PORT, 30000);
 
     const win = createMainWindow();

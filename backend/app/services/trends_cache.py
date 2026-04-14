@@ -5,6 +5,7 @@ Trends Cache – SQLite 파일 기반 캐시
 TTL 기본 24시간.
 """
 
+import os
 import json
 import sqlite3
 import time
@@ -12,14 +13,24 @@ from pathlib import Path
 
 from backend.app.config import get_settings
 
-_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "trends_cache.db"
+
+def _get_cache_db_path() -> Path:
+    """writable한 캐시 DB 경로."""
+    appdata = os.environ.get("SEO_CREATOR_APPDATA_DIR")
+    if appdata:
+        p = Path(appdata) / "trends_cache.db"
+        p.parent.mkdir(parents=True, exist_ok=True)
+        return p
+    return Path(__file__).resolve().parent.parent / "data" / "trends_cache.db"
+
+
 _conn: sqlite3.Connection | None = None
 
 
 def _get_conn() -> sqlite3.Connection:
     global _conn
     if _conn is None:
-        _conn = sqlite3.connect(str(_DB_PATH), check_same_thread=False)
+        _conn = sqlite3.connect(str(_get_cache_db_path()), check_same_thread=False)
         _conn.execute("""
             CREATE TABLE IF NOT EXISTS trends_cache (
                 seed       TEXT PRIMARY KEY,
