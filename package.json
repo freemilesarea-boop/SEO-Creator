@@ -14,7 +14,7 @@
     "build:app": "npm run build:frontend && electron-builder",
     "build:mac": "npm run build:frontend && electron-builder --mac",
     "build:win": "npm run build:frontend && electron-builder --win",
-    "postinstall": "cd frontend && npm install"
+    "postinstall": "cd frontend && npm install --prefer-offline --no-audit"
   },
   "dependencies": {
     "electron-is-dev": "^2.0.0"
@@ -55,10 +55,11 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["universal"]
+          "arch": ["x64", "arm64"]
         }
       ],
-      "darkModeSupport": true
+      "darkModeSupport": true,
+      "identity": null
     },
     "dmg": {
       "title": "SEO Creator",
@@ -77,8 +78,7 @@
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "installerHeaderIcon": "assets/icon.ico"
+      "allowToChangeInstallationDirectory": true
     },
     "linux": {
       "target": ["AppImage"],
