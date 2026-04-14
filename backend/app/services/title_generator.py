@@ -11,6 +11,10 @@ import random
 from pathlib import Path
 
 from backend.app.models.schemas import AnalysisResult, KeywordScore, Language
+from backend.app.services.coherence import (
+    pick_compatible_mood,
+    is_title_consistent,
+)
 
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 _dict_cache: dict | None = None
@@ -78,7 +82,11 @@ def _generate_ytm_titles(
     analysis: AnalysisResult, lang: str, count: int = 6
 ) -> list[str]:
     genre = _pick_display_keyword(analysis.primary_genre, "genres", lang)
-    mood = _pick_display_keyword(analysis.primary_mood, "moods", lang)
+    # situation-first: situation과 호환되는 mood 선택
+    compatible_mood = pick_compatible_mood(
+        analysis.primary_situation, analysis.detected_moods
+    )
+    mood = _pick_display_keyword(compatible_mood, "moods", lang)
     situation = _pick_display_keyword(analysis.primary_situation, "situations", lang)
 
     patterns = _YTM_KO_PATTERNS if lang == "ko" else _YTM_EN_PATTERNS
@@ -103,11 +111,11 @@ def _generate_ytm_titles(
         except (KeyError, IndexError):
             continue
 
-    # 중복 제거 후 상위 count 개
+    # 중복 제거 + consistency filter
     seen: set[str] = set()
     unique: list[str] = []
     for t in titles:
-        if t.lower() not in seen:
+        if t.lower() not in seen and is_title_consistent(analysis.primary_situation, t):
             seen.add(t.lower())
             unique.append(t)
     random.shuffle(unique)
@@ -148,7 +156,10 @@ def _generate_ytp_titles(
     analysis: AnalysisResult, lang: str, count: int = 6
 ) -> list[str]:
     genre = _pick_display_keyword(analysis.primary_genre, "genres", lang)
-    mood = _pick_display_keyword(analysis.primary_mood, "moods", lang)
+    compatible_mood = pick_compatible_mood(
+        analysis.primary_situation, analysis.detected_moods
+    )
+    mood = _pick_display_keyword(compatible_mood, "moods", lang)
     situation = _pick_display_keyword(analysis.primary_situation, "situations", lang)
 
     patterns = _YTP_KO_PATTERNS if lang == "ko" else _YTP_EN_PATTERNS
@@ -176,7 +187,7 @@ def _generate_ytp_titles(
     seen: set[str] = set()
     unique: list[str] = []
     for t in titles:
-        if t.lower() not in seen:
+        if t.lower() not in seen and is_title_consistent(analysis.primary_situation, t):
             seen.add(t.lower())
             unique.append(t)
     random.shuffle(unique)

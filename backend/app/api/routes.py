@@ -19,6 +19,7 @@ from backend.app.models.schemas import (
 )
 from backend.app.services.playlist_parser import parse_playlist, PlaylistParseError
 from backend.app.services.metadata_analyzer import analyze_playlist
+from backend.app.services.coherence import pick_compatible_mood, filter_compatible_moods
 from backend.app.services.keyword_engine import (
     collect_keywords,
     generate_combination_keywords,
@@ -37,6 +38,15 @@ def _build_response(
     language: str,
 ) -> GenerationResponse:
     """분석 결과 → 키워드 점수 → 제목 → 썸네일 → 최종 응답 조립."""
+
+    # 0) Situation-first: mood를 situation과 호환되도록 보정
+    compatible_mood = pick_compatible_mood(
+        analysis.primary_situation, analysis.detected_moods
+    )
+    analysis.primary_mood = compatible_mood
+    analysis.detected_moods = filter_compatible_moods(
+        analysis.primary_situation, analysis.detected_moods, max_count=3
+    )
 
     # 1) 키워드 수집 + 조합 + 롱테일
     all_keywords = collect_keywords(analysis)
