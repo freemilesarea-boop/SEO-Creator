@@ -206,6 +206,74 @@ def specificity_score(keyword: str) -> tuple[float, int]:
     return (score, dimensions)
 
 
+_GENRE_ANCHORS = {
+    "케이팝", "k-pop", "kpop", "팝", "pop", "팝송", "알앤비", "rnb", "r&b",
+    "힙합", "hiphop", "hip hop", "로파이", "lofi", "lo-fi", "재즈", "jazz",
+    "록", "rock", "발라드", "ballad", "인디", "indie", "클래식", "classical",
+    "어쿠스틱", "acoustic", "시티팝", "city pop", "앰비언트", "ambient",
+    "edm", "라틴", "latin", "제이팝", "jpop", "ost",
+}
+
+_STYLE_ANCHORS = {
+    "chill", "lofi", "lo-fi", "synthpop", "synth", "neo soul", "소울",
+    "city pop", "시티팝", "보사노바", "bossa nova", "trap", "boom bap",
+    "그루비", "groovy", "acoustic", "어쿠스틱", "소프트",
+}
+
+_MOOD_ANCHORS = {
+    "감성", "몽환", "에너지", "차분", "편안", "신나는", "섹시",
+    "emotional", "dreamy", "energetic", "chill", "mellow",
+    "vibes", "mood", "dark", "romantic",
+}
+
+_BROAD_NOUNS = {"노래", "음악", "뮤직", "songs", "music", "tracks"}
+
+
+def has_genre_anchor(keyword: str) -> bool:
+    """키워드에 genre/style/mood anchor가 하나라도 있는지."""
+    low = keyword.lower()
+    for anchor in _GENRE_ANCHORS | _STYLE_ANCHORS | _MOOD_ANCHORS:
+        if anchor in low:
+            return True
+    return False
+
+
+def genre_anchor_score(keyword: str) -> float:
+    """genre/style/mood anchor 보너스 점수. anchor 없고 broad noun만 있으면 패널티."""
+    low = keyword.lower()
+    score = 0.0
+
+    if any(a in low for a in _GENRE_ANCHORS):
+        score += 0.10
+    if any(a in low for a in _STYLE_ANCHORS):
+        score += 0.08
+    if any(a in low for a in _MOOD_ANCHORS):
+        score += 0.05
+
+    # anchor가 전혀 없고 broad noun만 있으면 패널티
+    if score == 0.0 and any(b in low for b in _BROAD_NOUNS):
+        score -= 0.12
+
+    return score
+
+
+def rewrite_broad_phrase(keyword: str, genre_display: str) -> str:
+    """'노래', '음악' 같은 broad noun을 genre_display로 교체."""
+    result = keyword
+    for broad in ["노래", "음악", "뮤직"]:
+        if broad in result:
+            result = result.replace(broad, genre_display, 1)
+            break
+    else:
+        for broad_en in ["songs", "music", "tracks"]:
+            if broad_en in result.lower():
+                # 대소문자 유지하며 교체
+                idx = result.lower().index(broad_en)
+                result = result[:idx] + genre_display + result[idx + len(broad_en):]
+                break
+    return result
+
+
 def competition_score(keyword: str) -> float:
     """경쟁도 추정 (0=낮음/좋음, 1=높음/나쁨).
 

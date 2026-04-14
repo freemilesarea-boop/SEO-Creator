@@ -20,7 +20,13 @@ from backend.app.services.coherence import (
     pick_compatible_mood,
     is_title_consistent,
 )
-from backend.app.services.keyword_engine import classify_keyword, specificity_score
+from backend.app.services.keyword_engine import (
+    classify_keyword,
+    specificity_score,
+    has_genre_anchor,
+    genre_anchor_score,
+    rewrite_broad_phrase,
+)
 from backend.app.services.intent_classifier import classify_intent
 
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -316,16 +322,19 @@ def _pick_keywords_hard_filtered(
         if intent in hard_block:
             continue
 
-        # 롱테일형: specificity 최소 기준
+        # 롱테일형: specificity 최소 기준 + genre-anchor 필수
         if is_longtail_set:
             if not _meets_longtail_specificity(ks.keyword):
                 continue
-            # generic creator 패널티
             if intent == "creator" and _is_generic_creator(ks.keyword):
+                continue
+            # genre-anchor가 없으면 1차에서 제외 (rewrite로 구제 가능)
+            if not has_genre_anchor(ks.keyword):
                 continue
 
         spec, dims = specificity_score(ks.keyword)
-        bonus = spec if is_longtail_set else 0.0
+        ga_bonus = genre_anchor_score(ks.keyword) if is_longtail_set else 0.0
+        bonus = spec + ga_bonus if is_longtail_set else 0.0
 
         if intent in hard_allow:
             primary.append((ks.keyword, ks.total_score + 0.1 + bonus))
@@ -338,7 +347,7 @@ def _pick_keywords_hard_filtered(
     if len(result) >= count:
         return result
 
-    # 2차: fallback 완화 (hard_block 외 전부 허용, specificity 완화)
+    # 2차: fallback – genre-anchor 없는 키워드를 rewrite 후 허용
     for ks in keyword_scores:
         if ks.keyword in result:
             continue
@@ -350,14 +359,26 @@ def _pick_keywords_hard_filtered(
         intent = classify_intent(ks.keyword)
         if intent in hard_block:
             continue
-        # fallback에서도 generic creator는 제외
         if is_longtail_set and intent == "creator" and _is_generic_creator(ks.keyword):
             continue
-        result.append(ks.keyword)
+
+        kw = ks.keyword
+        # genre-anchor 없으면 rewrite 시도
+        if is_longtail_set and not has_genre_anchor(kw):
+            kw = rewrite_broad_phrase(kw, _genre_display_cache.get("current", ""))
+            if not has_genre_anchor(kw):
+                continue  # rewrite 후에도 anchor 없으면 skip
+
+        if kw not in result:
+            result.append(kw)
         if len(result) >= count:
             break
 
     return result
+
+
+# genre display를 fallback rewrite에 전달하기 위한 임시 캐시
+_genre_display_cache: dict[str, str] = {}
 
 
 def _make_title_pair(
@@ -370,23 +391,29 @@ def _make_title_pair(
     if not kws:
         return "", ""
 
+    # broad phrase rewrite: "노래" → genre name
+    rewritten = []
+    for kw in kws:
+        if not has_genre_anchor(kw):
+            kw = rewrite_broad_phrase(kw, genre)
+        rewritten.append(kw)
+
     genre_lower = genre.lower()
-    ytm = kws[0]
+    ytm = rewritten[0]
 
-    if genre_lower in kws[0].lower():
-        ytp = f"{kws[0]} 플레이리스트" if language == "ko" else f"{kws[0]} playlist"
+    if genre_lower in rewritten[0].lower():
+        ytp = f"{rewritten[0]} 플레이리스트" if language == "ko" else f"{rewritten[0]} playlist"
     else:
-        ytp = f"{kws[0]} | {genre} 플레이리스트" if language == "ko" else f"{kws[0]} | {genre} playlist"
+        ytp = f"{rewritten[0]} | {genre} 플레이리스트" if language == "ko" else f"{rewritten[0]} | {genre} playlist"
 
-    if len(kws) > 1:
-        ytp = f"{kws[0]} | {kws[1]}"
+    if len(rewritten) > 1:
+        ytp = f"{rewritten[0]} | {rewritten[1]}"
 
     # specificity 확인 후 부족하면 확장
     if ensure_specific:
         _, ytm_dims = specificity_score(ytm)
-        if ytm_dims < 2 and len(kws) > 1:
-            # 더 구체적인 후보로 교체
-            for alt in kws[1:]:
+        if ytm_dims < 2 and len(rewritten) > 1:
+            for alt in rewritten[1:]:
                 _, alt_dims = specificity_score(alt)
                 if alt_dims >= 2:
                     ytm = alt
@@ -415,6 +442,9 @@ def generate_title_sets(
     """
     situation = analysis.primary_situation
     genre = _pick_display_keyword(analysis.primary_genre, "genres", language)
+
+    # genre display를 rewrite fallback에서 사용할 수 있도록 캐시
+    _genre_display_cache["current"] = genre
 
     # ── 감성형: template 기반 + mood intent hard filter ──
     ytm_pool = _generate_ytm_titles(analysis, language, count=12)
