@@ -1,4 +1,8 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+// Electron 앱에서는 18484 포트, 웹에서는 8000 포트 사용
+const API_BASE =
+  typeof window !== "undefined" && (window as any).electronAPI
+    ? "http://127.0.0.1:18484"
+    : process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export interface Analysis {
   detected_genres: string[];
