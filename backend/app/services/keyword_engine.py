@@ -150,6 +150,62 @@ def classify_keyword(keyword: str) -> str:
     return "mid-tail"
 
 
+def specificity_score(keyword: str) -> tuple[float, int]:
+    """키워드의 구체성 점수를 산정한다.
+
+    Returns:
+        (score, dimension_count) – score는 0~1, dimension_count는 충족된 조건 수
+    """
+    low = keyword.lower()
+    score = 0.0
+    dimensions = 0
+
+    # 1. 상황 정보 포함
+    situation_markers = {
+        "운동", "헬스", "러닝", "공부", "카페", "드라이브", "수면", "잠잘",
+        "비 오는", "새벽", "아침", "파티", "산책", "출퇴근", "여행",
+        "workout", "gym", "study", "cafe", "drive", "sleep", "rain",
+        "morning", "party", "walk", "commute", "travel",
+        "할 때", "할때", "에서",
+    }
+    if any(m in low for m in situation_markers):
+        score += 0.08
+        dimensions += 1
+
+    # 2. 장르 정보 포함
+    genre_markers = {
+        "케이팝", "k-pop", "kpop", "팝", "pop", "알앤비", "rnb", "r&b",
+        "힙합", "hiphop", "로파이", "lofi", "재즈", "jazz", "록", "rock",
+        "발라드", "ballad", "인디", "indie", "클래식", "classical",
+        "어쿠스틱", "acoustic", "시티팝", "앰비언트",
+    }
+    if any(m in low for m in genre_markers):
+        score += 0.08
+        dimensions += 1
+
+    # 3. 사용 맥락 포함
+    context_markers = {
+        "듣기 좋은", "틀기 좋은", "배경음악", "플레이리스트", "bgm",
+        "playlist", "노래 모음", "음악 모음", "용", "추천",
+        "for", "songs", "mix", "collection",
+    }
+    if any(m in low for m in context_markers):
+        score += 0.06
+        dimensions += 1
+
+    # 4. 감정/분위기 수식어 포함
+    modifier_markers = {
+        "텐션 올라가는", "분위기 미치는", "신나는", "차분한", "감성",
+        "에너지", "편안한", "몽환적", "섹시한", "파워풀",
+        "energetic", "chill", "emotional", "dreamy", "vibes",
+    }
+    if any(m in low for m in modifier_markers):
+        score += 0.05
+        dimensions += 1
+
+    return (score, dimensions)
+
+
 def competition_score(keyword: str) -> float:
     """경쟁도 추정 (0=낮음/좋음, 1=높음/나쁨).
 

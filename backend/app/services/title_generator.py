@@ -20,7 +20,7 @@ from backend.app.services.coherence import (
     pick_compatible_mood,
     is_title_consistent,
 )
-from backend.app.services.keyword_engine import classify_keyword
+from backend.app.services.keyword_engine import classify_keyword, specificity_score
 from backend.app.services.intent_classifier import classify_intent
 
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -271,6 +271,24 @@ def _generate_ytp_titles(
 # ── 키워드 기반 제목 생성 ──
 
 
+def _is_generic_creator(keyword: str) -> bool:
+    """너무 짧거나 상황/장르 없는 creator 키워드인지 확인."""
+    words = keyword.split()
+    if len(words) <= 3:
+        return True
+    # 상황과 장르 정보 모두 없으면 generic
+    _, dims = specificity_score(keyword)
+    if dims < 2:
+        return True
+    return False
+
+
+def _meets_longtail_specificity(keyword: str) -> bool:
+    """롱테일형 세트 최소 specificity 기준 (2개 이상 dimension)."""
+    _, dims = specificity_score(keyword)
+    return dims >= 2
+
+
 def _pick_keywords_hard_filtered(
     keyword_scores: list[KeywordScore],
     set_type: str,
@@ -278,13 +296,14 @@ def _pick_keywords_hard_filtered(
     situation: str,
     count: int = 3,
 ) -> list[str]:
-    """세트 타입의 intent hard filter를 적용하여 키워드를 선택."""
+    """세트 타입의 intent hard filter + specificity gate를 적용하여 키워드를 선택."""
     policy = _SET_INTENT_POLICY.get(set_type, {})
     hard_allow = policy.get("hard_allow", {"mood", "discovery", "utility", "creator"})
     hard_block = policy.get("hard_block", set())
     fallback_allow = policy.get("fallback_allow", hard_allow)
+    is_longtail_set = (set_type == "longtail")
 
-    # 1차: hard_allow만
+    # 1차: hard_allow + specificity gate
     primary: list[tuple[str, float]] = []
     for ks in keyword_scores:
         kw_type = classify_keyword(ks.keyword)
@@ -292,13 +311,26 @@ def _pick_keywords_hard_filtered(
             continue
         if not is_title_consistent(situation, ks.keyword):
             continue
+
         intent = classify_intent(ks.keyword)
         if intent in hard_block:
             continue
+
+        # 롱테일형: specificity 최소 기준
+        if is_longtail_set:
+            if not _meets_longtail_specificity(ks.keyword):
+                continue
+            # generic creator 패널티
+            if intent == "creator" and _is_generic_creator(ks.keyword):
+                continue
+
+        spec, dims = specificity_score(ks.keyword)
+        bonus = spec if is_longtail_set else 0.0
+
         if intent in hard_allow:
-            primary.append((ks.keyword, ks.total_score + 0.1))
+            primary.append((ks.keyword, ks.total_score + 0.1 + bonus))
         elif intent in fallback_allow:
-            primary.append((ks.keyword, ks.total_score))
+            primary.append((ks.keyword, ks.total_score + bonus))
 
     primary.sort(key=lambda x: x[1], reverse=True)
     result = [kw for kw, _ in primary[:count]]
@@ -306,7 +338,7 @@ def _pick_keywords_hard_filtered(
     if len(result) >= count:
         return result
 
-    # 2차: fallback 완화 (hard_block 외 전부 허용)
+    # 2차: fallback 완화 (hard_block 외 전부 허용, specificity 완화)
     for ks in keyword_scores:
         if ks.keyword in result:
             continue
@@ -317,6 +349,9 @@ def _pick_keywords_hard_filtered(
             continue
         intent = classify_intent(ks.keyword)
         if intent in hard_block:
+            continue
+        # fallback에서도 generic creator는 제외
+        if is_longtail_set and intent == "creator" and _is_generic_creator(ks.keyword):
             continue
         result.append(ks.keyword)
         if len(result) >= count:
@@ -330,6 +365,7 @@ def _make_title_pair(
     genre: str,
     language: str,
     situation: str,
+    ensure_specific: bool = False,
 ) -> tuple[str, str]:
     if not kws:
         return "", ""
@@ -344,6 +380,17 @@ def _make_title_pair(
 
     if len(kws) > 1:
         ytp = f"{kws[0]} | {kws[1]}"
+
+    # specificity 확인 후 부족하면 확장
+    if ensure_specific:
+        _, ytm_dims = specificity_score(ytm)
+        if ytm_dims < 2 and len(kws) > 1:
+            # 더 구체적인 후보로 교체
+            for alt in kws[1:]:
+                _, alt_dims = specificity_score(alt)
+                if alt_dims >= 2:
+                    ytm = alt
+                    break
 
     if not is_title_consistent(situation, ytm):
         ytm = ""
@@ -393,7 +440,9 @@ def generate_title_sets(
         keyword_scores, "longtail",
         ["long-tail", "mid-tail"], situation, 3,
     )
-    longtail_ytm, longtail_ytp = _make_title_pair(longtail_kws, genre, language, situation)
+    longtail_ytm, longtail_ytp = _make_title_pair(
+        longtail_kws, genre, language, situation, ensure_specific=True
+    )
 
     # ── fallback 준비 ──
     if not ytm_mood:
