@@ -102,11 +102,11 @@ export default function LinkInputForm({ onResult, onError }: LinkInputFormProps)
     try {
       const input: LinkInput = { url: url.trim() };
       if (language) input.language = language;
-      if (overrideGenre) input.override_genre = overrideGenre;
-      if (overrideMood) input.override_mood = overrideMood;
-      if (overrideSituation) input.override_situation = overrideSituation;
+      if (overrideGenre) input.overrideGenre = overrideGenre;
+      if (overrideMood) input.overrideMood = overrideMood;
+      if (overrideSituation) input.overrideSituation = overrideSituation;
       if (excludeKeywords.trim()) {
-        input.exclude_keywords = excludeKeywords
+        input.excludeKeywords = excludeKeywords
           .split(",")
           .map((k) => k.trim())
           .filter(Boolean);

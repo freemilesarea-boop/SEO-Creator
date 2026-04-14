@@ -80,13 +80,13 @@ export default function ManualInputForm({ onResult, onError }: ManualInputFormPr
       const input: ManualInput = { genre, mood, situation, language };
       if (emotion.trim()) input.emotion = emotion.trim();
       if (referenceArtists.trim()) {
-        input.reference_artists = referenceArtists
+        input.referenceArtists = referenceArtists
           .split(",")
           .map((a) => a.trim())
           .filter(Boolean);
       }
       if (excludeKeywords.trim()) {
-        input.exclude_keywords = excludeKeywords
+        input.excludeKeywords = excludeKeywords
           .split(",")
           .map((k) => k.trim())
           .filter(Boolean);

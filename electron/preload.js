@@ -1,12 +1,19 @@
 /**
- * Electron Preload Script
+ * Electron Preload – IPC bridge
  *
- * contextBridge로 렌더러에 안전하게 API 노출
+ * renderer에서 window.electronAPI 로 engine 호출
  */
-
-const { contextBridge } = require("electron");
+const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("electronAPI", {
-  platform: process.platform,
   isElectron: true,
+  platform: process.platform,
+
+  healthCheck: () => ipcRenderer.invoke("engine:health"),
+
+  generateManual: (input) => ipcRenderer.invoke("engine:generateManual", input),
+
+  generateLink: (input) => ipcRenderer.invoke("engine:generateLink", input),
+
+  getHistory: (limit) => ipcRenderer.invoke("engine:getHistory", limit),
 });

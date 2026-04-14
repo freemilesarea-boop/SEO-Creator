@@ -1,24 +1,22 @@
 {
   "name": "seo-creator",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "YouTube 플레이리스트 SEO 최적화 제목 · 썸네일 생성기",
   "author": "SEO Creator",
   "license": "MIT",
   "main": "electron/main.js",
   "scripts": {
-    "dev": "concurrently --kill-others \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:electron\"",
-    "dev:backend": "cd backend && python3 -m uvicorn app.main:app --host 127.0.0.1 --port 18484 --reload",
+    "dev": "concurrently --kill-others \"npm run dev:frontend\" \"npm run dev:electron\"",
     "dev:frontend": "cd frontend && npm run dev",
-    "dev:electron": "sleep 5 && ELECTRON_DEV=true electron .",
-    "build:backend": "cd backend && pyinstaller seo-backend.spec --clean --noconfirm",
+    "dev:electron": "sleep 3 && electron .",
     "build:frontend": "cd frontend && npm run build",
-    "build:app": "npm run build:backend && npm run build:frontend && electron-builder",
-    "build:mac": "npm run build:backend && npm run build:frontend && electron-builder --mac",
-    "build:win": "npm run build:backend && npm run build:frontend && electron-builder --win",
+    "build:app": "npm run build:frontend && electron-builder",
+    "build:mac": "npm run build:frontend && electron-builder --mac",
+    "build:win": "npm run build:frontend && electron-builder --win",
     "postinstall": "cd frontend && npm install --prefer-offline --no-audit"
   },
   "dependencies": {
-    "electron-is-dev": "^2.0.0"
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "concurrently": "^9.1.0",
@@ -33,24 +31,21 @@
     },
     "files": [
       "electron/**/*",
+      "engine/**/*",
+      "backend/app/data/**/*.json",
       "frontend/out/**/*",
       "!**/.next/**",
-      "!**/node_modules/**",
-      "!backend/**"
-    ],
-    "extraResources": [
-      {
-        "from": "backend/dist/seo-backend/",
-        "to": "backend-bundle/",
-        "filter": ["**/*"]
-      }
+      "!**/node_modules/**"
     ],
     "mac": {
       "category": "public.app-category.productivity",
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64", "arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         }
       ],
       "darkModeSupport": true,
@@ -59,15 +54,25 @@
     "dmg": {
       "title": "SEO Creator",
       "contents": [
-        { "x": 130, "y": 220 },
-        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
       ]
     },
     "win": {
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ]
     },
@@ -76,7 +81,9 @@
       "allowToChangeInstallationDirectory": true
     },
     "linux": {
-      "target": ["AppImage"],
+      "target": [
+        "AppImage"
+      ],
       "category": "Utility"
     }
   }

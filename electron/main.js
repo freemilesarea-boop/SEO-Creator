@@ -1,111 +1,15 @@
 /**
- * Electron Main Process (v3)
+ * Electron Main Process (v4 - No Python, No Server)
  *
- * 1. 스플래시 표시
- * 2. FastAPI 백엔드 child_process 실행
- * 3. Health check 성공 → 메인 UI
- * 4. 실패 → 에러 화면 (로그 경로 + 내용 표시)
+ * 모든 SEO 로직을 Node.js engine에서 직접 실행.
+ * FastAPI/Python/uvicorn 완전 제거.
  */
 
-const { app, BrowserWindow, shell } = require("electron");
+const { app, BrowserWindow, shell, ipcMain } = require("electron");
 const path = require("path");
-const fs = require("fs");
-const { startBackend, stopBackend, waitForBackend, initLog, getLogPath } = require("./backend-launcher");
 
 let mainWindow = null;
-
 const isDev = !app.isPackaged;
-const BACKEND_PORT = 18484;
-
-function createSplashWindow() {
-  const splash = new BrowserWindow({
-    width: 420,
-    height: 320,
-    frame: false,
-    transparent: true,
-    resizable: false,
-    alwaysOnTop: true,
-    webPreferences: { nodeIntegration: false, contextIsolation: true },
-  });
-
-  splash.loadURL(
-    `data:text/html;charset=utf-8,${encodeURIComponent(`<!DOCTYPE html>
-<html><head><style>
-body { margin:0; display:flex; align-items:center; justify-content:center;
-  height:100vh; background:#09090b; color:#e4e4e7;
-  font-family:system-ui,-apple-system,sans-serif; flex-direction:column; border-radius:12px; }
-.title { font-size:28px; font-weight:700; margin-bottom:8px; }
-.accent { color:#a78bfa; }
-.sub { font-size:13px; color:#71717a; margin-bottom:24px; }
-.loader { width:32px; height:32px; border:3px solid #27272a;
-  border-top-color:#7c3aed; border-radius:50%; animation:spin .8s linear infinite; }
-@keyframes spin { to { transform:rotate(360deg); } }
-</style></head><body>
-<div class="title"><span class="accent">SEO</span> Creator</div>
-<div class="sub">백엔드를 시작하는 중...</div>
-<div class="loader"></div>
-</body></html>`)}`
-  );
-
-  return splash;
-}
-
-function createErrorWindow(errorMsg) {
-  const win = new BrowserWindow({
-    width: 560,
-    height: 520,
-    frame: true,
-    resizable: true,
-    title: "SEO Creator - 오류",
-    backgroundColor: "#09090b",
-    webPreferences: { nodeIntegration: false, contextIsolation: true },
-  });
-
-  const logFilePath = getLogPath() || path.join(app.getPath("userData"), "backend.log");
-
-  // 로그 파일 마지막 30줄 읽기
-  let logTail = "";
-  try {
-    const content = fs.readFileSync(logFilePath, "utf-8");
-    const lines = content.split("\n");
-    logTail = lines.slice(-30).join("\n");
-  } catch (_) {
-    logTail = "(로그 파일을 읽을 수 없습니다)";
-  }
-
-  const escaped = (s) =>
-    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-
-  win.loadURL(
-    `data:text/html;charset=utf-8,${encodeURIComponent(`<!DOCTYPE html>
-<html><head><style>
-body { margin:0; padding:24px; background:#09090b; color:#e4e4e7;
-  font-family:system-ui,-apple-system,sans-serif; }
-h1 { font-size:20px; color:#ef4444; margin-bottom:8px; }
-.msg { font-size:13px; color:#a1a1aa; line-height:1.6; margin-bottom:16px; }
-.hint { font-size:12px; color:#71717a; margin-bottom:12px; }
-code { background:#27272a; padding:2px 6px; border-radius:4px; font-size:11px; color:#e4e4e7; }
-.logbox { font-size:10px; color:#52525b; background:#18181b; padding:12px;
-  border-radius:8px; max-height:200px; overflow-y:auto; white-space:pre-wrap;
-  word-break:break-all; font-family:monospace; border:1px solid #27272a; }
-.path { font-size:11px; color:#71717a; margin-top:8px; }
-</style></head><body>
-<h1>앱 내부 서버 시작 실패</h1>
-<div class="msg">${escaped(errorMsg)}</div>
-<div class="hint">해결 방법:</div>
-<div class="msg">
-  1. 앱을 완전히 종료 후 다시 실행해 주세요.<br/>
-  2. 다른 프로그램이 포트 18484를 사용 중인지 확인해 주세요.<br/>
-  3. 문제가 지속되면 아래 로그 파일을 첨부하여 지원팀에 문의해 주세요.
-</div>
-<div class="hint">최근 로그:</div>
-<div class="logbox">${escaped(logTail)}</div>
-<div class="path">전체 로그: ${escaped(logFilePath)}</div>
-</body></html>`)}`
-  );
-
-  return win;
-}
 
 function createMainWindow() {
   mainWindow = new BrowserWindow({
@@ -133,60 +37,46 @@ function createMainWindow() {
   if (isDev) {
     mainWindow.loadURL("http://localhost:3000");
   } else {
-    // app.getAppPath() = asar 내부 루트. frontend/out은 asar 안에 포함됨.
-    const indexPath = path.join(app.getAppPath(), "frontend", "out", "index.html");
-    console.log(`[main] Loading index: ${indexPath}`);
-    console.log(`[main] Exists: ${fs.existsSync(indexPath)}`);
-    mainWindow.loadFile(indexPath);
+    mainWindow.loadFile(path.join(app.getAppPath(), "frontend", "out", "index.html"));
   }
 
   mainWindow.on("closed", () => { mainWindow = null; });
   return mainWindow;
 }
 
-app.on("ready", async () => {
-  const logPath = initLog(app.getPath("userData"));
+app.on("ready", () => {
+  // Engine 초기화
+  const engine = require("../engine");
+  engine.initHistory(app.getPath("userData"));
 
-  console.log(`[main] isDev=${isDev}, isPackaged=${app.isPackaged}`);
-  console.log(`[main] appPath=${app.getAppPath()}`);
-  console.log(`[main] resourcesPath=${process.resourcesPath}`);
-  console.log(`[main] platform=${process.platform}`);
-  if (logPath) console.log(`[main] Log: ${logPath}`);
+  // IPC 핸들러 등록
+  ipcMain.handle("engine:health", () => engine.healthCheck());
 
-  const splash = createSplashWindow();
+  ipcMain.handle("engine:generateManual", (_, input) => {
+    try { return { ok: true, data: engine.generateFromManual(input) }; }
+    catch (e) { return { ok: false, error: e.message }; }
+  });
 
-  try {
-    const userDataPath = app.getPath("userData");
-    startBackend(BACKEND_PORT, app.isPackaged, app.getAppPath(), userDataPath);
-    await waitForBackend(BACKEND_PORT, 30000);
+  ipcMain.handle("engine:generateLink", async (_, input) => {
+    try { return { ok: true, data: await engine.generateFromLink(input) }; }
+    catch (e) { return { ok: false, error: e.message }; }
+  });
 
-    const win = createMainWindow();
-    win.once("ready-to-show", () => {
-      if (splash && !splash.isDestroyed()) splash.destroy();
-      win.show();
-    });
+  ipcMain.handle("engine:getHistory", (_, limit) => {
+    try { return { ok: true, data: engine.getHistory(limit) }; }
+    catch (e) { return { ok: false, error: e.message }; }
+  });
 
-    // ready-to-show 안 오면 8초 후 강제 표시
-    setTimeout(() => {
-      if (splash && !splash.isDestroyed()) splash.destroy();
-      if (win && !win.isVisible()) win.show();
-    }, 8000);
-  } catch (err) {
-    console.error("[main] Backend failed:", err.message);
-    if (splash && !splash.isDestroyed()) splash.destroy();
-    createErrorWindow(err.message);
-  }
+  // 윈도우 생성
+  const win = createMainWindow();
+  win.once("ready-to-show", () => win.show());
+  setTimeout(() => { if (win && !win.isVisible()) win.show(); }, 5000);
 });
 
 app.on("window-all-closed", () => {
-  stopBackend();
   if (process.platform !== "darwin") app.quit();
 });
 
 app.on("activate", () => {
   if (mainWindow === null) createMainWindow().show();
-});
-
-app.on("before-quit", () => {
-  stopBackend();
 });
