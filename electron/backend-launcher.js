@@ -1,19 +1,90 @@
 /**
- * Backend Launcher
+ * Backend Launcher (production-safe)
  *
  * FastAPI(uvicorn) 프로세스를 child_process로 관리한다.
- * - 앱 시작 시 자동 실행
- * - 포트 충돌 감지 및 재시도
- * - health check로 준비 상태 확인
+ * - app.isPackaged 기준으로 경로 분리
+ * - Python 실행 파일 다단계 fallback
+ * - userData/backend.log에 전체 로깅
  * - 앱 종료 시 자동 정리
  */
 
-const { spawn } = require("child_process");
+const { spawn, execSync } = require("child_process");
 const path = require("path");
+const fs = require("fs");
 const http = require("http");
 const net = require("net");
 
 let backendProcess = null;
+let logStream = null;
+
+/**
+ * 로그 파일 초기화
+ */
+function initLog(userDataPath) {
+  try {
+    const logPath = path.join(userDataPath, "backend.log");
+    logStream = fs.createWriteStream(logPath, { flags: "a" });
+    _log(`=== Backend launcher started at ${new Date().toISOString()} ===`);
+    _log(`Platform: ${process.platform}, Arch: ${process.arch}`);
+    _log(`UserData: ${userDataPath}`);
+    return logPath;
+  } catch (e) {
+    console.error("[backend-log] Failed to init log:", e.message);
+    return null;
+  }
+}
+
+function _log(msg) {
+  const line = `[${new Date().toISOString()}] ${msg}`;
+  console.log(`[backend] ${msg}`);
+  if (logStream) {
+    logStream.write(line + "\n");
+  }
+}
+
+/**
+ * Python 실행 파일 찾기 (다단계 fallback)
+ */
+function findPython() {
+  // 1. 환경변수
+  if (process.env.PYTHON_PATH) {
+    _log(`Trying PYTHON_PATH: ${process.env.PYTHON_PATH}`);
+    if (fs.existsSync(process.env.PYTHON_PATH)) {
+      return process.env.PYTHON_PATH;
+    }
+  }
+
+  // 2. 플랫폼별 well-known 경로
+  const candidates =
+    process.platform === "win32"
+      ? ["python", "python3", "C:\\Python312\\python.exe", "C:\\Python311\\python.exe"]
+      : [
+          "/usr/bin/python3",
+          "/usr/local/bin/python3",
+          "/opt/homebrew/bin/python3",
+          "/opt/homebrew/opt/python@3.12/bin/python3.12",
+          "/opt/homebrew/opt/python@3.13/bin/python3.13",
+          "python3",
+          "python",
+        ];
+
+  for (const cmd of candidates) {
+    try {
+      if (cmd.includes("/") && !fs.existsSync(cmd)) continue;
+      const version = execSync(`"${cmd}" --version 2>&1`, {
+        timeout: 5000,
+        encoding: "utf-8",
+      }).trim();
+      _log(`Found Python: ${cmd} (${version})`);
+      return cmd;
+    } catch (_) {
+      // try next
+    }
+  }
+
+  _log("WARNING: No Python found, using 'python3' as fallback");
+  return "python3";
+}
 
 /**
  * 포트가 사용 중인지 확인
@@ -22,8 +93,7 @@ function isPortInUse(port) {
   return new Promise((resolve) => {
     const server = net.createServer();
     server.once("error", (err) => {
-      if (err.code === "EADDRINUSE") resolve(true);
-      else resolve(false);
+      resolve(err.code === "EADDRINUSE");
     });
     server.once("listening", () => {
       server.close();
@@ -49,17 +119,47 @@ async function findAvailablePort(startPort) {
 /**
  * 백엔드 프로세스 시작
  */
-function startBackend(port, isDev) {
+function startBackend(port, isPackaged, appPath) {
   if (backendProcess) return;
 
-  const projectRoot = isDev
-    ? path.join(__dirname, "..")
-    : path.join(process.resourcesPath, "backend-bundle");
+  // 경로 결정
+  let backendCwd;
+  if (isPackaged) {
+    // 패키징된 앱: extraResources에 backend가 들어감
+    backendCwd = path.join(process.resourcesPath, "backend-bundle");
+    _log(`Mode: PACKAGED`);
+    _log(`resourcesPath: ${process.resourcesPath}`);
+  } else {
+    // 개발 모드: 프로젝트 루트
+    backendCwd = appPath || path.join(__dirname, "..");
+    _log(`Mode: DEVELOPMENT`);
+  }
 
-  const backendDir = isDev ? projectRoot : projectRoot;
+  _log(`Backend CWD: ${backendCwd}`);
 
-  // Python 실행 파일 경로
-  const pythonCmd = process.platform === "win32" ? "python" : "python3";
+  // CWD 존재 확인
+  if (!fs.existsSync(backendCwd)) {
+    _log(`ERROR: Backend directory not found: ${backendCwd}`);
+    return;
+  }
+
+  // backend/app/main.py 존재 확인
+  const mainPy = path.join(backendCwd, "backend", "app", "main.py");
+  if (!fs.existsSync(mainPy)) {
+    _log(`ERROR: main.py not found at: ${mainPy}`);
+    // extraResources 구조 다를 수 있으므로 ls로 확인
+    try {
+      const files = fs.readdirSync(backendCwd);
+      _log(`Contents of ${backendCwd}: ${files.join(", ")}`);
+    } catch (e) {
+      _log(`Cannot read directory: ${e.message}`);
+    }
+    return;
+  }
+  _log(`Found main.py: ${mainPy}`);
+
+  // Python 찾기
+  const pythonCmd = findPython();
 
   const args = [
     "-m",
@@ -71,30 +171,41 @@ function startBackend(port, isDev) {
     String(port),
   ];
 
-  console.log(`[backend] Starting: ${pythonCmd} ${args.join(" ")}`);
-  console.log(`[backend] CWD: ${backendDir}`);
+  _log(`Command: ${pythonCmd} ${args.join(" ")}`);
 
-  backendProcess = spawn(pythonCmd, args, {
-    cwd: backendDir,
-    stdio: ["ignore", "pipe", "pipe"],
-    env: { ...process.env, PYTHONDONTWRITEBYTECODE: "1" },
-  });
+  try {
+    backendProcess = spawn(pythonCmd, args, {
+      cwd: backendCwd,
+      stdio: ["ignore", "pipe", "pipe"],
+      env: {
+        ...process.env,
+        PYTHONDONTWRITEBYTECODE: "1",
+        PYTHONUNBUFFERED: "1",
+      },
+    });
+  } catch (err) {
+    _log(`ERROR: spawn failed: ${err.message}`);
+    backendProcess = null;
+    return;
+  }
+
+  _log(`Process spawned: PID ${backendProcess.pid}`);
 
   backendProcess.stdout.on("data", (data) => {
-    console.log(`[backend] ${data.toString().trim()}`);
+    _log(`stdout: ${data.toString().trim()}`);
   });
 
   backendProcess.stderr.on("data", (data) => {
-    console.log(`[backend] ${data.toString().trim()}`);
+    _log(`stderr: ${data.toString().trim()}`);
   });
 
   backendProcess.on("error", (err) => {
-    console.error(`[backend] Failed to start: ${err.message}`);
+    _log(`ERROR: Process error: ${err.message}`);
     backendProcess = null;
   });
 
-  backendProcess.on("exit", (code) => {
-    console.log(`[backend] Exited with code ${code}`);
+  backendProcess.on("exit", (code, signal) => {
+    _log(`Process exited: code=${code}, signal=${signal}`);
     backendProcess = null;
   });
 }
@@ -105,28 +216,29 @@ function startBackend(port, isDev) {
 function stopBackend() {
   if (!backendProcess) return;
 
-  console.log("[backend] Stopping...");
+  _log("Stopping backend...");
 
   try {
     if (process.platform === "win32") {
       spawn("taskkill", ["/pid", String(backendProcess.pid), "/f", "/t"]);
     } else {
       backendProcess.kill("SIGTERM");
-      // 2초 후에도 살아있으면 강제 종료
       setTimeout(() => {
         if (backendProcess) {
           try {
             backendProcess.kill("SIGKILL");
-          } catch (_) {
-            // already dead
-          }
+          } catch (_) {}
         }
       }, 2000);
     }
-  } catch (_) {
-    // ignore
-  }
+  } catch (_) {}
   backendProcess = null;
+
+  if (logStream) {
+    _log("Backend stopped.");
+    logStream.end();
+    logStream = null;
+  }
 }
 
 /**
@@ -137,7 +249,9 @@ function waitForBackend(port, timeoutMs = 30000) {
 
   return new Promise((resolve, reject) => {
     function check() {
-      if (Date.now() - startTime > timeoutMs) {
+      const elapsed = Date.now() - startTime;
+      if (elapsed > timeoutMs) {
+        _log(`ERROR: Health check timeout after ${timeoutMs}ms`);
         return reject(new Error(`Backend did not start within ${timeoutMs}ms`));
       }
 
@@ -145,7 +259,7 @@ function waitForBackend(port, timeoutMs = 30000) {
         `http://127.0.0.1:${port}/api/v1/health`,
         (res) => {
           if (res.statusCode === 200) {
-            console.log("[backend] Ready!");
+            _log(`Health check PASSED (${elapsed}ms)`);
             resolve();
           } else {
             setTimeout(check, 500);
@@ -167,4 +281,4 @@ function waitForBackend(port, timeoutMs = 30000) {
   });
 }
 
-module.exports = { startBackend, stopBackend, waitForBackend, findAvailablePort };
+module.exports = { startBackend, stopBackend, waitForBackend, findAvailablePort, initLog };

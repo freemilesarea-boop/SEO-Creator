@@ -33,11 +33,9 @@
     "files": [
       "electron/**/*",
       "frontend/out/**/*",
-      "backend/**/*",
-      "!backend/**/__pycache__/**",
-      "!backend/**/*.pyc",
       "!**/.next/**",
-      "!**/node_modules/**"
+      "!**/node_modules/**",
+      "!backend/**"
     ],
     "extraResources": [
       {
@@ -46,7 +44,8 @@
         "filter": [
           "**/*",
           "!**/__pycache__/**",
-          "!**/*.pyc"
+          "!**/*.pyc",
+          "!**/*.db"
         ]
       }
     ],
