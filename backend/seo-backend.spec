@@ -2,66 +2,105 @@
 """
 PyInstaller spec for SEO Creator Backend
 
-빌드 명령:
+빌드:
   cd backend
-  pyinstaller seo-backend.spec
+  pyinstaller seo-backend.spec --clean --noconfirm
 
-결과: dist/seo-backend (macOS/Linux) 또는 dist/seo-backend.exe (Windows)
+결과: dist/seo-backend/ 디렉터리 (onedir 모드)
 """
 
 import os
-import sys
 from pathlib import Path
 
 block_cipher = None
 
-# 데이터 파일 수집
 backend_root = os.path.abspath(".")
-data_dir = os.path.join(backend_root, "app", "data")
+project_root = os.path.dirname(backend_root)
+
+# ── 데이터 파일 수집 ──
 
 datas = []
-# keyword dictionary JSON 파일들
-for f in Path(data_dir).glob("*.json"):
-    datas.append((str(f), os.path.join("backend", "app", "data")))
 
-# build_dictionary.py도 포함
-build_dict = os.path.join(data_dir, "build_dictionary.py")
-if os.path.exists(build_dict):
-    datas.append((build_dict, os.path.join("backend", "app", "data")))
+# 1. backend 패키지 전체를 소스로 포함 (import 구조 유지)
+#    backend/ → _MEIPASS/backend/
+datas.append((backend_root, "backend"))
 
-# backend 패키지 전체를 데이터로 포함 (import 구조 유지)
+# ── Analysis ──
+
 a = Analysis(
     ["run_server.py"],
-    pathex=[backend_root, os.path.dirname(backend_root)],
+    pathex=[project_root, backend_root],
     binaries=[],
     datas=datas,
     hiddenimports=[
+        # uvicorn 내부 모듈 (lazy import)
         "uvicorn",
         "uvicorn.logging",
         "uvicorn.loops",
         "uvicorn.loops.auto",
+        "uvicorn.loops.asyncio",
         "uvicorn.protocols",
         "uvicorn.protocols.http",
         "uvicorn.protocols.http.auto",
+        "uvicorn.protocols.http.h11_impl",
+        "uvicorn.protocols.http.httptools_impl",
         "uvicorn.protocols.websockets",
         "uvicorn.protocols.websockets.auto",
+        "uvicorn.protocols.websockets.wsproto_impl",
         "uvicorn.lifespan",
         "uvicorn.lifespan.on",
         "uvicorn.lifespan.off",
+        # fastapi / starlette
         "fastapi",
+        "fastapi.applications",
+        "fastapi.routing",
         "fastapi.middleware",
         "fastapi.middleware.cors",
+        "fastapi.responses",
+        "fastapi.exceptions",
         "starlette",
+        "starlette.applications",
         "starlette.routing",
         "starlette.middleware",
+        "starlette.middleware.cors",
+        "starlette.responses",
+        "starlette.requests",
+        "starlette.staticfiles",
+        "starlette.exceptions",
+        "starlette.concurrency",
+        # pydantic
         "pydantic",
+        "pydantic.fields",
         "pydantic_settings",
         "pydantic_core",
+        "pydantic_core._pydantic_core",
+        "annotated_types",
+        # sqlalchemy
         "sqlalchemy",
         "sqlalchemy.ext.asyncio",
+        "sqlalchemy.ext.asyncio.engine",
+        "sqlalchemy.ext.asyncio.session",
+        "sqlalchemy.dialects.sqlite",
+        "sqlalchemy.pool",
+        # aiosqlite
         "aiosqlite",
+        # async
+        "anyio",
+        "anyio._backends",
+        "anyio._backends._asyncio",
+        "sniffio",
+        # http
         "httpx",
+        "httpcore",
+        "h11",
+        # yt-dlp
         "yt_dlp",
+        # greenlet (sqlalchemy async)
+        "greenlet",
+        # dotenv
+        "dotenv",
+        "python_dotenv",
+        # backend 패키지
         "backend",
         "backend.app",
         "backend.app.main",
@@ -87,7 +126,11 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=["tkinter", "matplotlib", "scipy", "numpy", "PIL", "cv2"],
+    excludes=[
+        "tkinter", "matplotlib", "scipy", "numpy", "PIL", "cv2",
+        "pytest", "setuptools", "wheel", "pip",
+        "cryptography",
+    ],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
@@ -96,24 +139,33 @@ a = Analysis(
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
+# ── onedir 모드 (디버깅 용이, 안정적) ──
+
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
     [],
+    exclude_binaries=True,
     name="seo-backend",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
-    upx_exclude=[],
-    runtime_tmpdir=None,
-    console=True,  # 서버이므로 콘솔 필요
+    upx=False,
+    console=True,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+)
+
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=False,
+    upx_exclude=[],
+    name="seo-backend",
 )

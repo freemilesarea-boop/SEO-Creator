@@ -40,22 +40,9 @@
     ],
     "extraResources": [
       {
-        "from": "backend/dist/",
+        "from": "backend/dist/seo-backend/",
         "to": "backend-bundle/",
-        "filter": ["seo-backend", "seo-backend.exe"]
-      },
-      {
-        "from": "backend",
-        "to": "backend-bundle/backend",
-        "filter": [
-          "**/*",
-          "!**/__pycache__/**",
-          "!**/*.pyc",
-          "!**/*.db",
-          "!dist/**",
-          "!build/**",
-          "!*.spec"
-        ]
+        "filter": ["**/*"]
       }
     ],
     "mac": {

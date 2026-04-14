@@ -159,13 +159,14 @@ function _logDirContents(dir, label, depth = 0) {
 
 function _findBundledBinary(resourcesPath) {
   const binName = process.platform === "win32" ? "seo-backend.exe" : "seo-backend";
+  // onedir 모드: backend-bundle/seo-backend (실행 파일이 폴더 안에)
   const candidates = [
     path.join(resourcesPath, "backend-bundle", binName),
     path.join(resourcesPath, binName),
   ];
   for (const p of candidates) {
+    _log(`Checking binary: ${p} → ${fs.existsSync(p) ? "EXISTS" : "NOT FOUND"}`);
     if (fs.existsSync(p)) {
-      _log(`Found bundled binary: ${p}`);
       return p;
     }
   }
