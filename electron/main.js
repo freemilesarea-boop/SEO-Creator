@@ -18,6 +18,7 @@ function createMainWindow() {
     minWidth: 800,
     minHeight: 600,
     title: "SEO Creator",
+    icon: path.join(__dirname, "..", "build", "icon.png"),
     titleBarStyle: process.platform === "darwin" ? "hiddenInset" : "default",
     trafficLightPosition: process.platform === "darwin" ? { x: 16, y: 16 } : undefined,
     backgroundColor: "#09090b",
