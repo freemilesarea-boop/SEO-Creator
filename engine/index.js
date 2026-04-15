@@ -5,7 +5,7 @@
  * FastAPI/Python 없이 모든 로직을 Node.js에서 실행.
  */
 
-const { v4: uuidv4 } = require("uuid");
+const crypto = require("crypto");
 const { analyzePlaylist } = require("./metadata-analyzer");
 const { pickCompatibleMood, filterCompatibleMoods } = require("./coherence");
 const { collectKeywords, generateCombinationKeywords, generateLongtailKeywords, scoreAllKeywords } = require("./keyword-engine");
@@ -88,7 +88,7 @@ function _buildResponse(analysis, language) {
     };
   });
 
-  const genId = uuidv4().substring(0, 8);
+  const genId = crypto.randomUUID().substring(0, 8);
 
   return {
     analysis,
