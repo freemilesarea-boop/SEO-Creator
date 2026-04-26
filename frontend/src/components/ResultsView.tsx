@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   RefreshCw, Loader2, BarChart3, Tag, Music2, Smile, MapPin,
-  Globe, Users, ChevronDown, ChevronUp,
+  Globe, Users, ChevronDown, ChevronUp, Star,
 } from "lucide-react";
 import type { GenerationResponse } from "@/lib/api";
-import { regenerateAll } from "@/lib/api";
+import {
+  regenerateAll,
+  hasFavorite,
+  addFavorite,
+  removeFavorite,
+} from "@/lib/api";
 import ResultCard from "./ResultCard";
 
 // dual-compat helper: camelCase or snake_case
@@ -19,11 +24,63 @@ interface ResultsViewProps {
   onRegenerate: (data: GenerationResponse) => void;
   onToast: (msg: string) => void;
   onError: (msg: string) => void;
+  /** 즐겨찾기 추가/제거 후 부모에서 FavoritesPanel을 재로딩하기 위한 콜백. */
+  onFavoriteChange?: () => void;
 }
 
-export default function ResultsView({ data, onRegenerate, onToast, onError }: ResultsViewProps) {
+export default function ResultsView({
+  data,
+  onRegenerate,
+  onToast,
+  onError,
+  onFavoriteChange,
+}: ResultsViewProps) {
   const [regenerating, setRegenerating] = useState(false);
   const [showKeywords, setShowKeywords] = useState(false);
+  const [favored, setFavored] = useState(false);
+  const [favBusy, setFavBusy] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!data.generationId) {
+      setFavored(false);
+      return;
+    }
+    hasFavorite(data.generationId)
+      .then((v) => { if (!cancelled) setFavored(Boolean(v)); })
+      .catch(() => { if (!cancelled) setFavored(false); });
+    return () => { cancelled = true; };
+  }, [data.generationId]);
+
+  const toggleFavorite = async () => {
+    if (!data.generationId || favBusy) return;
+    setFavBusy(true);
+    try {
+      if (favored) {
+        await removeFavorite(data.generationId);
+        setFavored(false);
+        onToast("즐겨찾기에서 제거되었습니다");
+      } else {
+        const firstSet = data.results && data.results[0];
+        const labelBits: string[] = [];
+        if (firstSet?.setLabel) labelBits.push(firstSet.setLabel);
+        if (firstSet?.ytMusicTitle) labelBits.push(firstSet.ytMusicTitle);
+        const label = labelBits.join(" · ").slice(0, 60) || data.generationId;
+        await addFavorite({
+          id: data.generationId,
+          label,
+          payload: data,
+        });
+        setFavored(true);
+        onToast("즐겨찾기에 추가되었습니다");
+      }
+      if (onFavoriteChange) onFavoriteChange();
+    } catch (e) {
+      onError(e instanceof Error ? e.message : "즐겨찾기 작업에 실패했습니다");
+    } finally {
+      setFavBusy(false);
+    }
+  };
 
   const handleRegenerate = async () => {
     setRegenerating(true);
@@ -46,10 +103,32 @@ export default function ResultsView({ data, onRegenerate, onToast, onError }: Re
     <div className="space-y-8 animate-fade-in">
       {/* Analysis Summary */}
       <div className="card">
-        <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-zinc-100">
-          <BarChart3 className="h-5 w-5 text-brand-400" />
-          분석 결과 요약
-        </h3>
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <h3 className="flex items-center gap-2 text-lg font-semibold text-zinc-100">
+            <BarChart3 className="h-5 w-5 text-brand-400" />
+            분석 결과 요약
+          </h3>
+          <button
+            type="button"
+            onClick={toggleFavorite}
+            disabled={favBusy || !data.generationId}
+            className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs transition-colors disabled:opacity-50 ${
+              favored
+                ? "border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20"
+                : "border-zinc-700/60 bg-zinc-800/40 text-zinc-300 hover:bg-zinc-700/60"
+            }`}
+            title={favored ? "즐겨찾기 해제" : "즐겨찾기 추가"}
+          >
+            {favBusy ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Star
+                className={`h-3.5 w-3.5 ${favored ? "fill-amber-300 text-amber-300" : ""}`}
+              />
+            )}
+            {favored ? "즐겨찾기됨" : "즐겨찾기"}
+          </button>
+        </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div className="flex items-start gap-3">
             <Music2 className="mt-0.5 h-4 w-4 shrink-0 text-brand-400" />

@@ -5,6 +5,8 @@ import { Link2, SlidersHorizontal, X, AlertCircle } from "lucide-react";
 import LinkInputForm from "@/components/LinkInputForm";
 import ManualInputForm from "@/components/ManualInputForm";
 import ResultsView from "@/components/ResultsView";
+import HistoryPanel from "@/components/HistoryPanel";
+import FavoritesPanel from "@/components/FavoritesPanel";
 import type { GenerationResponse } from "@/lib/api";
 
 type Tab = "link" | "manual";
@@ -20,6 +22,8 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState<Tab>("link");
   const [result, setResult] = useState<GenerationResponse | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [historyKey, setHistoryKey] = useState(0);
+  const [favoritesKey, setFavoritesKey] = useState(0);
 
   const addToast = useCallback((message: string, type: "success" | "error" = "success") => {
     const id = Date.now();
@@ -36,7 +40,12 @@ export default function HomePage() {
 
   const handleResult = useCallback((data: GenerationResponse) => {
     setResult(data);
+    setHistoryKey((k) => k + 1);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  const bumpFavorites = useCallback(() => {
+    setFavoritesKey((k) => k + 1);
   }, []);
 
   const handleError = useCallback(
@@ -82,7 +91,8 @@ export default function HomePage() {
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         {!result ? (
           /* Input Section */
-          <div className="mx-auto max-w-2xl">
+          <div className="mx-auto max-w-4xl">
+            <div className="mx-auto max-w-2xl">
             <div className="mb-8 text-center">
               <h2 className="text-2xl font-bold text-zinc-100 sm:text-3xl">
                 YouTube 플레이리스트를 위한
@@ -133,6 +143,23 @@ export default function HomePage() {
                 />
               )}
             </div>
+            </div>
+
+            {/* History + Favorites */}
+            <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <HistoryPanel
+                onLoad={handleResult}
+                onError={handleError}
+                onToast={handleToast}
+                refreshKey={historyKey}
+              />
+              <FavoritesPanel
+                onLoad={handleResult}
+                onError={handleError}
+                onToast={handleToast}
+                refreshKey={favoritesKey}
+              />
+            </div>
           </div>
         ) : (
           /* Results Section */
@@ -141,6 +168,7 @@ export default function HomePage() {
             onRegenerate={handleResult}
             onToast={handleToast}
             onError={handleError}
+            onFavoriteChange={bumpFavorites}
           />
         )}
       </main>
