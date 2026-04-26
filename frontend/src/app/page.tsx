@@ -1,21 +1,37 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Link2, SlidersHorizontal, X, AlertCircle } from "lucide-react";
+import { Link2, SlidersHorizontal, X, AlertCircle, ClipboardCopy } from "lucide-react";
 import LinkInputForm from "@/components/LinkInputForm";
 import ManualInputForm from "@/components/ManualInputForm";
 import ResultsView from "@/components/ResultsView";
 import HistoryPanel from "@/components/HistoryPanel";
 import FavoritesPanel from "@/components/FavoritesPanel";
-import { getAppVersion, type GenerationResponse } from "@/lib/api";
+import {
+  getAppVersion,
+  getPlatform,
+  type GenerationResponse,
+} from "@/lib/api";
+import { buildErrorReport } from "@/lib/error-report";
 
 type Tab = "link" | "manual";
+
+interface ErrorContext {
+  screen?: string;
+  generationId?: string;
+  language?: string;
+  lastAction?: string;
+  /** ISO timestamp at the moment the toast was added. */
+  timestamp?: string;
+}
 
 interface Toast {
   id: number;
   message: string;
   type: "success" | "error";
   leaving?: boolean;
+  /** Set on error toasts so the "진단 정보 복사" 버튼이 풍부한 보고서를 만들 수 있다. */
+  errorContext?: ErrorContext;
 }
 
 export default function HomePage() {
@@ -34,18 +50,25 @@ export default function HomePage() {
     return () => { cancelled = true; };
   }, []);
 
-  const addToast = useCallback((message: string, type: "success" | "error" = "success") => {
-    const id = Date.now();
-    setToasts((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setToasts((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, leaving: true } : t))
-      );
+  const addToast = useCallback(
+    (
+      message: string,
+      type: "success" | "error" = "success",
+      errorContext?: ErrorContext,
+    ) => {
+      const id = Date.now();
+      setToasts((prev) => [...prev, { id, message, type, errorContext }]);
       setTimeout(() => {
-        setToasts((prev) => prev.filter((t) => t.id !== id));
-      }, 300);
-    }, 3000);
-  }, []);
+        setToasts((prev) =>
+          prev.map((t) => (t.id === id ? { ...t, leaving: true } : t))
+        );
+        setTimeout(() => {
+          setToasts((prev) => prev.filter((t) => t.id !== id));
+        }, 300);
+      }, type === "error" ? 6000 : 3000);
+    },
+    []
+  );
 
   const handleResult = useCallback((data: GenerationResponse) => {
     setResult(data);
@@ -59,9 +82,37 @@ export default function HomePage() {
 
   const handleError = useCallback(
     (msg: string) => {
-      addToast(msg, "error");
+      addToast(msg, "error", {
+        screen: result ? "results" : "input",
+        generationId: result?.generationId,
+        language: result?.language,
+        timestamp: new Date().toISOString(),
+      });
     },
-    [addToast]
+    [addToast, result]
+  );
+
+  const copyErrorReport = useCallback(
+    async (toast: Toast) => {
+      const ctx = toast.errorContext || {};
+      const text = buildErrorReport({
+        appVersion: appVersion || "dev",
+        platform: getPlatform(),
+        screen: ctx.screen,
+        errorMessage: toast.message,
+        lastAction: ctx.lastAction,
+        generationId: ctx.generationId,
+        language: ctx.language,
+        timestamp: ctx.timestamp,
+      });
+      try {
+        await navigator.clipboard.writeText(text);
+        addToast("진단 정보가 복사되었습니다", "success");
+      } catch {
+        addToast("진단 정보 복사에 실패했습니다", "error");
+      }
+    },
+    [addToast, appVersion]
   );
 
   const handleToast = useCallback(
@@ -213,6 +264,16 @@ export default function HomePage() {
               </svg>
             )}
             {toast.message}
+            {toast.type === "error" && (
+              <button
+                onClick={() => copyErrorReport(toast)}
+                className="ml-2 inline-flex items-center gap-1 rounded border border-red-500/30 bg-red-500/10 px-1.5 py-0.5 text-[10px] text-red-100 transition-colors hover:bg-red-500/20"
+                title="진단 정보 복사"
+              >
+                <ClipboardCopy className="h-3 w-3" />
+                진단 복사
+              </button>
+            )}
             <button
               onClick={() =>
                 setToasts((prev) => prev.filter((t) => t.id !== toast.id))

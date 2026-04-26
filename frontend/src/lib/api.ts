@@ -323,6 +323,22 @@ export async function getAppVersion(): Promise<string> {
   }
 }
 
+/**
+ * 동기 헬퍼: process.platform 류 정보를 안전하게 반환한다.
+ * api.ts 밖에서는 window.electronAPI 를 직접 참조하지 말고 이 함수를 사용.
+ * - Electron 환경: "darwin" | "win32" | "linux" 등
+ * - 그 외:        "web"
+ * - SSR (window 미정의): "unknown"
+ */
+export function getPlatform(): string {
+  if (typeof window === "undefined") return "unknown";
+  const api = window.electronAPI;
+  if (api && typeof api.platform === "string" && api.platform) {
+    return api.platform;
+  }
+  return "web";
+}
+
 // ── Regenerate (Step 6b) ──
 
 export async function regenerateAll(
