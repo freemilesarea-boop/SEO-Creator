@@ -1,6 +1,6 @@
 {
   "name": "seo-creator",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "YouTube 플레이리스트 SEO 최적화 제목 · 썸네일 생성기",
   "author": "SEO Creator",
   "license": "MIT",
@@ -8,18 +8,22 @@
   "scripts": {
     "dev": "concurrently --kill-others \"npm run dev:frontend\" \"npm run dev:electron\"",
     "dev:frontend": "cd frontend && npm run dev",
-    "dev:electron": "sleep 3 && electron .",
+    "dev:electron": "wait-on http://localhost:3000 && cross-env ELECTRON_DEV=true electron .",
     "build:frontend": "cd frontend && npm run build",
     "build:app": "npm run build:frontend && electron-builder",
     "build:mac": "npm run build:frontend && electron-builder --mac",
     "build:win": "npm run build:frontend && electron-builder --win",
+    "build:linux": "npm run build:frontend && electron-builder --linux",
+    "test:engine": "node scripts/test-engine.js",
     "postinstall": "cd frontend && npm install --prefer-offline --no-audit"
   },
   "dependencies": {},
   "devDependencies": {
     "concurrently": "^9.1.0",
+    "cross-env": "^7.0.3",
     "electron": "^33.2.0",
-    "electron-builder": "^25.1.8"
+    "electron-builder": "^25.1.8",
+    "wait-on": "^8.0.1"
   },
   "build": {
     "appId": "com.seocreator.app",
@@ -30,22 +34,24 @@
     "files": [
       "electron/**/*",
       "engine/**/*",
+      "engine/data/**/*.json",
       "build/**/*",
-      "backend/app/data/**/*.json",
       "frontend/out/**/*",
       "!**/.next/**",
-      "!frontend/node_modules/**"
+      "!frontend/node_modules/**",
+      "!frontend/src/**",
+      "!**/__pycache__/**"
     ],
+    "extraMetadata": {
+      "main": "electron/main.js"
+    },
     "mac": {
       "category": "public.app-category.productivity",
       "icon": "build/icon.png",
       "target": [
         {
           "target": "dmg",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
+          "arch": ["x64", "arm64"]
         }
       ],
       "darkModeSupport": true,
@@ -54,16 +60,8 @@
     "dmg": {
       "title": "SEO Creator",
       "contents": [
-        {
-          "x": 130,
-          "y": 220
-        },
-        {
-          "x": 410,
-          "y": 220,
-          "type": "link",
-          "path": "/Applications"
-        }
+        { "x": 130, "y": 220 },
+        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
       ]
     },
     "win": {
@@ -71,9 +69,7 @@
       "target": [
         {
           "target": "nsis",
-          "arch": [
-            "x64"
-          ]
+          "arch": ["x64"]
         }
       ]
     },
@@ -82,9 +78,7 @@
       "allowToChangeInstallationDirectory": true
     },
     "linux": {
-      "target": [
-        "AppImage"
-      ],
+      "target": ["AppImage"],
       "category": "Utility"
     }
   }

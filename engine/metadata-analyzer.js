@@ -159,14 +159,7 @@ const MOOD_SUPPRESSES_SITUATION = {
 // Load keyword dictionary (cached)
 // ---------------------------------------------------------------------------
 
-const DICTIONARY_PATH = path.resolve(
-  __dirname,
-  "..",
-  "backend",
-  "app",
-  "data",
-  "keyword_dictionary.json"
-);
+const DICTIONARY_PATH = path.resolve(__dirname, "data", "keyword_dictionary.json");
 
 let _dictionary = null;
 

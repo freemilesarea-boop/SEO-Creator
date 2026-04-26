@@ -4,21 +4,23 @@
 
 const path = require("path");
 const fs = require("fs");
+const { resolveGenre, resolveSituation } = require("./util/aliases");
 
 let _dict = null;
 function loadDict() {
   if (!_dict) {
-    const p = path.join(__dirname, "..", "backend", "app", "data", "keyword_dictionary.json");
+    const p = path.join(__dirname, "data", "keyword_dictionary.json");
     _dict = JSON.parse(fs.readFileSync(p, "utf-8"));
   }
   return _dict;
 }
 
-// ── helpers ──
+// ── helpers (alias-aware) ──
 
 function collectGenreKw(genre, lang) {
   const d = loadDict();
-  const e = (d.genres || {})[genre] || {};
+  const key = resolveGenre(genre);
+  const e = (d.genres || {})[key] || {};
   return lang === "en" ? (e.en_keywords || []) : (e.ko_keywords || []);
 }
 function collectMoodKw(mood, lang) {
@@ -28,7 +30,8 @@ function collectMoodKw(mood, lang) {
 }
 function collectSituationKw(sit, lang) {
   const d = loadDict();
-  const e = (d.situations || {})[sit] || {};
+  const key = resolveSituation(sit);
+  const e = (d.situations || {})[key] || {};
   return lang === "en" ? (e.en_keywords || []) : (e.ko_keywords || []);
 }
 
@@ -199,10 +202,13 @@ function _getDisplayNames(analysis) {
   const names = new Set();
   const lang = (analysis.language === "ko" || analysis.language === "en") ? analysis.language : "ko";
   const lv = ((d.language_variants || {})[lang] || {});
-  for (const [sec, key] of [["genre_display", analysis.primaryGenre], ["mood_display", analysis.primaryMood], ["situation_display", analysis.primarySituation]]) {
+  const gKey = resolveGenre(analysis.primaryGenre);
+  const sKey = resolveSituation(analysis.primarySituation);
+  const mKey = analysis.primaryMood;
+  for (const [sec, key] of [["genre_display", gKey], ["mood_display", mKey], ["situation_display", sKey]]) {
     const v = (lv[sec] || {})[key]; if (v) names.add(v.toLowerCase());
   }
-  for (const [sec, key] of [["genres", analysis.primaryGenre], ["moods", analysis.primaryMood], ["situations", analysis.primarySituation]]) {
+  for (const [sec, key] of [["genres", gKey], ["moods", mKey], ["situations", sKey]]) {
     const e = (d[sec] || {})[key] || {};
     for (const kw of (e.ko_keywords || []).slice(0, 2)) names.add(kw.toLowerCase());
     for (const kw of (e.en_keywords || []).slice(0, 2)) names.add(kw.toLowerCase());

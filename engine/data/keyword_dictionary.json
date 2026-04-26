@@ -941,6 +941,255 @@
         "misty blue",
         "sage green"
       ]
+    },
+    "edm": {
+      "ko_keywords": [
+        "edm",
+        "일렉트로닉",
+        "하우스",
+        "빅룸",
+        "페스티벌",
+        "클럽 음악",
+        "드랍",
+        "베이스",
+        "트랜스",
+        "빅비트"
+      ],
+      "en_keywords": [
+        "edm",
+        "electronic dance music",
+        "house",
+        "big room",
+        "festival",
+        "club music",
+        "drop",
+        "bass",
+        "trance",
+        "big beat"
+      ],
+      "related_artists": [
+        "David Guetta",
+        "Calvin Harris",
+        "Marshmello",
+        "Martin Garrix",
+        "The Chainsmokers",
+        "Tiesto",
+        "Skrillex",
+        "Avicii",
+        "Zedd",
+        "Kygo"
+      ],
+      "related_moods": [
+        "energetic",
+        "intense",
+        "happy"
+      ],
+      "related_situations": [
+        "party",
+        "workout"
+      ],
+      "color_tones": [
+        "neon pink",
+        "electric blue",
+        "laser green",
+        "midnight purple"
+      ],
+      "visual_keywords": [
+        "festival lights",
+        "laser show",
+        "crowd hands",
+        "neon glow",
+        "dj booth"
+      ]
+    },
+    "latin": {
+      "ko_keywords": [
+        "라틴",
+        "레게톤",
+        "살사",
+        "바차타",
+        "스페인어 노래",
+        "라틴 팝",
+        "쿠바",
+        "스페인",
+        "열정",
+        "라티노"
+      ],
+      "en_keywords": [
+        "latin",
+        "reggaeton",
+        "salsa",
+        "bachata",
+        "spanish songs",
+        "latin pop",
+        "cuban",
+        "spanish",
+        "latino",
+        "caliente"
+      ],
+      "related_artists": [
+        "Bad Bunny",
+        "Karol G",
+        "J Balvin",
+        "Daddy Yankee",
+        "Shakira",
+        "Maluma",
+        "Anitta",
+        "Rosalía",
+        "Ozuna",
+        "Rauw Alejandro"
+      ],
+      "related_moods": [
+        "energetic",
+        "sexy",
+        "happy"
+      ],
+      "related_situations": [
+        "party",
+        "workout",
+        "cafe"
+      ],
+      "color_tones": [
+        "sunset orange",
+        "tropical pink",
+        "vivid yellow",
+        "caribbean blue"
+      ],
+      "visual_keywords": [
+        "beach",
+        "palm trees",
+        "carnival",
+        "dancers",
+        "tropical sunset"
+      ]
+    },
+    "jpop": {
+      "ko_keywords": [
+        "제이팝",
+        "jpop",
+        "일본 노래",
+        "일본 팝",
+        "애니송",
+        "city pop",
+        "시티팝",
+        "아이돌",
+        "jrock",
+        "일본 음악"
+      ],
+      "en_keywords": [
+        "jpop",
+        "j-pop",
+        "japanese songs",
+        "japanese pop",
+        "anime song",
+        "city pop",
+        "jrock",
+        "japanese idol",
+        "anison",
+        "tokyo pop"
+      ],
+      "related_artists": [
+        "YOASOBI",
+        "Ado",
+        "Official髭男dism",
+        "King Gnu",
+        "Kenshi Yonezu",
+        "Aimer",
+        "LiSA",
+        "Mrs. GREEN APPLE",
+        "Vaundy",
+        "Tatsuro Yamashita"
+      ],
+      "related_moods": [
+        "happy",
+        "energetic",
+        "emotional",
+        "dreamy",
+        "nostalgic"
+      ],
+      "related_situations": [
+        "commute",
+        "walk",
+        "cafe",
+        "night_drive"
+      ],
+      "color_tones": [
+        "sakura pink",
+        "tokyo neon",
+        "navy night",
+        "retro pastel"
+      ],
+      "visual_keywords": [
+        "tokyo skyline",
+        "sakura",
+        "retro arcade",
+        "neon sign",
+        "anime aesthetic"
+      ]
+    },
+    "ost": {
+      "ko_keywords": [
+        "ost",
+        "드라마 ost",
+        "영화 ost",
+        "사운드트랙",
+        "주제가",
+        "드라마 음악",
+        "영화 음악",
+        "엔딩곡",
+        "ost 모음",
+        "감성 ost"
+      ],
+      "en_keywords": [
+        "ost",
+        "soundtrack",
+        "drama ost",
+        "movie ost",
+        "film score",
+        "theme song",
+        "ending song",
+        "kdrama ost",
+        "cinematic",
+        "movie theme"
+      ],
+      "related_artists": [
+        "Hans Zimmer",
+        "Hisaishi Joe",
+        "Ludovico Einaudi",
+        "Ramin Djawadi",
+        "Ennio Morricone",
+        "Yiruma",
+        "Gaho",
+        "Crush",
+        "Punch",
+        "Kim Bum Soo"
+      ],
+      "related_moods": [
+        "emotional",
+        "romantic",
+        "nostalgic",
+        "dreamy",
+        "cinematic"
+      ],
+      "related_situations": [
+        "rain",
+        "late_night",
+        "reading",
+        "sunset"
+      ],
+      "color_tones": [
+        "cinematic gold",
+        "deep blue",
+        "candle warm",
+        "mist gray"
+      ],
+      "visual_keywords": [
+        "movie scene",
+        "drama still",
+        "cinematic frame",
+        "dramatic lighting",
+        "film grain"
+      ]
     }
   },
   "moods": {
@@ -2132,6 +2381,211 @@
         "{genre} for the midnight hour",
         "3am {genre} vibes"
       ]
+    },
+    "cooking": {
+      "ko_keywords": [
+        "요리할 때",
+        "요리 음악",
+        "주방",
+        "쿠킹",
+        "베이킹",
+        "요리할때 듣는",
+        "집밥",
+        "요리 BGM",
+        "주말 브런치",
+        "쿠킹 플레이리스트"
+      ],
+      "en_keywords": [
+        "cooking",
+        "cooking music",
+        "kitchen",
+        "baking",
+        "brunch",
+        "sunday cooking",
+        "cooking bgm",
+        "kitchen vibe",
+        "sunday brunch",
+        "weekend cooking"
+      ],
+      "related_genres": [
+        "acoustic",
+        "jazz",
+        "lofi",
+        "indie"
+      ],
+      "related_moods": [
+        "chill",
+        "peaceful",
+        "happy"
+      ],
+      "color_tones": [
+        "warm cream",
+        "pastel yellow",
+        "sage green",
+        "wood brown"
+      ],
+      "visual_keywords": [
+        "kitchen",
+        "ingredients",
+        "wooden cutting board",
+        "steam",
+        "brunch table"
+      ]
+    },
+    "reading": {
+      "ko_keywords": [
+        "독서",
+        "독서할 때",
+        "책 읽을 때",
+        "서재",
+        "북카페",
+        "집중 독서",
+        "느린 시간",
+        "조용한 독서",
+        "서점",
+        "책 읽기"
+      ],
+      "en_keywords": [
+        "reading",
+        "while reading",
+        "book reading",
+        "study lounge",
+        "quiet reading",
+        "slow reading",
+        "bookstore",
+        "library reading",
+        "cozy reading",
+        "page turning"
+      ],
+      "related_genres": [
+        "lofi",
+        "classical",
+        "jazz",
+        "acoustic",
+        "indie"
+      ],
+      "related_moods": [
+        "peaceful",
+        "chill",
+        "dreamy",
+        "nostalgic"
+      ],
+      "color_tones": [
+        "paper beige",
+        "warm brown",
+        "ink black",
+        "muted green"
+      ],
+      "visual_keywords": [
+        "open book",
+        "reading nook",
+        "warm lamp",
+        "stacked books",
+        "tea cup"
+      ]
+    },
+    "commute": {
+      "ko_keywords": [
+        "출퇴근",
+        "출근길",
+        "퇴근길",
+        "지하철",
+        "버스",
+        "대중교통",
+        "아침 출근",
+        "저녁 퇴근",
+        "러시아워",
+        "통학"
+      ],
+      "en_keywords": [
+        "commute",
+        "commuting",
+        "subway",
+        "train",
+        "bus",
+        "morning commute",
+        "evening commute",
+        "rush hour",
+        "city ride",
+        "public transport"
+      ],
+      "related_genres": [
+        "pop",
+        "kpop",
+        "indie",
+        "rnb",
+        "jpop"
+      ],
+      "related_moods": [
+        "chill",
+        "energetic",
+        "happy",
+        "nostalgic"
+      ],
+      "color_tones": [
+        "morning blue",
+        "steel gray",
+        "sunset orange",
+        "window light"
+      ],
+      "visual_keywords": [
+        "subway window",
+        "headphones",
+        "city street",
+        "morning train",
+        "commuter"
+      ]
+    },
+    "walk": {
+      "ko_keywords": [
+        "산책",
+        "걸을 때",
+        "공원",
+        "천변",
+        "조깅",
+        "아침 산책",
+        "저녁 산책",
+        "걷기 좋은",
+        "러닝",
+        "워킹"
+      ],
+      "en_keywords": [
+        "walk",
+        "walking",
+        "park walk",
+        "stroll",
+        "jog",
+        "morning walk",
+        "evening walk",
+        "hiking",
+        "weekend walk",
+        "hangout walk"
+      ],
+      "related_genres": [
+        "indie",
+        "acoustic",
+        "pop",
+        "jpop"
+      ],
+      "related_moods": [
+        "chill",
+        "happy",
+        "nostalgic",
+        "peaceful"
+      ],
+      "color_tones": [
+        "sky blue",
+        "leaf green",
+        "golden hour",
+        "fresh white"
+      ],
+      "visual_keywords": [
+        "park path",
+        "autumn leaves",
+        "golden hour",
+        "river side",
+        "quiet street"
+      ]
     }
   },
   "visuals": {
@@ -3178,28 +3632,35 @@
   },
   "banned_words": {
     "ko": [
+      "극혐",
+      "역대급",
+      "긴급속보",
+      "실화",
+      "충격실화",
+      "대박",
+      "충격",
+      "개쩌는",
+      "끝판왕",
+      "레전드",
       "미쳤",
       "ㄹㅇ",
-      "실화",
-      "레전드",
-      "충격",
-      "극혐",
-      "개쩌는",
-      "대박사건",
-      "긴급속보",
-      "충격실화"
+      "장난없",
+      "대박사건"
     ],
     "en": [
       "insane",
-      "shocking",
-      "crazy",
-      "you won't believe",
-      "gone wrong",
-      "clickbait",
       "must see",
       "exposed",
+      "you won't believe",
+      "must watch",
       "leaked",
-      "OMG"
+      "OMG",
+      "crazy",
+      "banger alert",
+      "gone wrong",
+      "mind-blowing",
+      "shocking",
+      "clickbait"
     ]
   },
   "language_variants": {
@@ -3283,6 +3744,13 @@
         "latin": "Latin",
         "jpop": "J-Pop",
         "ost": "OST"
+      },
+      "mood_display": {},
+      "situation_display": {
+        "cooking": "cooking",
+        "reading": "reading",
+        "commute": "commute",
+        "walk": "walk"
       }
     }
   },
@@ -3348,5 +3816,17 @@
     "collage grid 2x2 with overlay title",
     "side crop portrait + vertical title",
     "cinematic widescreen bar + center text"
-  ]
+  ],
+  "genre_aliases": {
+    "electronic": "edm",
+    "house": "edm",
+    "citypop": "jpop",
+    "ambient": "lofi"
+  },
+  "situation_aliases": {
+    "late_night": "night_drive",
+    "breakup": "rain",
+    "sunset": "walk",
+    "travel": "walk"
+  }
 }
