@@ -37,10 +37,7 @@ export interface TitleFragment {
 
 export interface TitleExplanation {
   title: string;
-  /** 신규 (engine ≥ 2.1) */
   keywordType?: string;
-  /** 호환 (engine ≤ 2.0 snake_case) */
-  keyword_type?: string;
   intent: string;
   competition: string;
   fragments: TitleFragment[];
@@ -48,12 +45,8 @@ export interface TitleExplanation {
 }
 
 export interface ResultSetExplanation {
-  /** 호환: engine은 ytMusicExplanation/ytPlaylistExplanation을 카멜로 반환 */
   ytMusicExplanation?: TitleExplanation;
   ytPlaylistExplanation?: TitleExplanation;
-  /** 호환: 기존 컴포넌트가 snake_case로 접근하던 경로 */
-  yt_music_explanation?: TitleExplanation;
-  yt_playlist_explanation?: TitleExplanation;
 }
 
 export interface DescriptionPack {
@@ -282,26 +275,6 @@ export async function generateFromManual(
   input: ManualInput
 ): Promise<GenerationResponse> {
   return unwrap(_api().generateManual(input));
-}
-
-/**
- * @deprecated since 2.1.0 — Step 6b에서 regenerateAll/regenerateSet으로
- * 대체될 예정. 호출 시그니처 호환을 위해 유지.
- *
- * 현재 구현은 직전 generation의 input 정보를 잃어버린 placeholder다.
- * 새 코드는 `regenerateAll(prev, opts)` 또는 `regenerateSet(prev, setKey, opts)`를 사용할 것.
- */
-export async function regenerate(
-  _generationId: string
-): Promise<GenerationResponse> {
-  return unwrap(
-    _api().generateManual({
-      genre: "pop",
-      mood: "chill",
-      situation: "cafe",
-      language: "ko",
-    })
-  );
 }
 
 export async function getHistory(): Promise<HistoryListItem[]> {
