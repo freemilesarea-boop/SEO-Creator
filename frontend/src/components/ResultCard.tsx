@@ -85,7 +85,7 @@ function ExplanationPanel({ explanation, label }: { explanation: TitleExplanatio
       {/* 메타 정보 */}
       <div className="flex flex-wrap gap-2 text-[10px]">
         <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-400">
-          {typeLabel[explanation.keyword_type] || explanation.keyword_type}
+          {(() => { const kt = explanation.keywordType ?? explanation.keyword_type ?? ""; return typeLabel[kt] || kt; })()}
         </span>
         <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-400">
           {intentLabel[explanation.intent] || explanation.intent}
