@@ -295,3 +295,103 @@ export async function regenerate(
 export async function getHistory(): Promise<HistoryListItem[]> {
   return unwrap(_api().getHistory(20));
 }
+
+// ── Regenerate (Step 6b) ──
+
+export async function regenerateAll(
+  prev: GenerationResponse,
+  opts?: RegenerateOpts
+): Promise<GenerationResponse> {
+  return unwrap(_api().regenerateAll(prev, opts));
+}
+
+export async function regenerateSet(
+  prev: GenerationResponse,
+  setKey: string,
+  opts?: RegenerateOpts
+): Promise<GenerationResponse> {
+  return unwrap(_api().regenerateSet(prev, setKey, opts));
+}
+
+export async function regenerateTitle(
+  prev: GenerationResponse,
+  setKey: string,
+  opts?: RegenerateOpts
+): Promise<GenerationResponse> {
+  return unwrap(_api().regenerateTitle(prev, setKey, opts));
+}
+
+export async function regenerateThumbnail(
+  prev: GenerationResponse,
+  setKey: string,
+  opts?: RegenerateOpts
+): Promise<GenerationResponse> {
+  return unwrap(_api().regenerateThumbnail(prev, setKey, opts));
+}
+
+export async function regenerateTags(
+  prev: GenerationResponse,
+  setKey: string,
+  opts?: RegenerateOpts
+): Promise<GenerationResponse> {
+  return unwrap(_api().regenerateTags(prev, setKey, opts));
+}
+
+// ── Favorites (Step 6b) ──
+
+export async function addFavorite(
+  record: FavoriteRecord
+): Promise<{ total: number }> {
+  return unwrap(_api().addFavorite(record));
+}
+
+export async function removeFavorite(id: string): Promise<boolean> {
+  return unwrap(_api().removeFavorite(id));
+}
+
+export async function listFavorites(): Promise<FavoriteRecord[]> {
+  return unwrap(_api().listFavorites());
+}
+
+export async function hasFavorite(id: string): Promise<boolean> {
+  return unwrap(_api().hasFavorite(id));
+}
+
+// ── History extras (Step 6b) ──
+
+export async function getHistoryDetail(
+  id: string
+): Promise<GenerationResponse | null> {
+  return unwrap(_api().getHistoryDetail(id));
+}
+
+export async function removeHistory(id: string): Promise<boolean> {
+  return unwrap(_api().removeHistory(id));
+}
+
+// ── Export (Step 6b) ──
+
+export async function exportJSON(
+  response: GenerationResponse
+): Promise<string> {
+  return unwrap(_api().exportJSON(response));
+}
+
+export async function exportCSV(
+  response: GenerationResponse
+): Promise<string> {
+  return unwrap(_api().exportCSV(response));
+}
+
+export async function exportTXT(
+  response: GenerationResponse
+): Promise<string> {
+  return unwrap(_api().exportTXT(response));
+}
+
+export async function suggestExportFilename(
+  response: GenerationResponse,
+  ext: string
+): Promise<string> {
+  return unwrap(_api().suggestExportFilename(response, ext));
+}
