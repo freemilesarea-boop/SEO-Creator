@@ -35,6 +35,9 @@ const { parsePlaylist } = require("./playlist-parser");
 const { perSetScore, titleDiversity } = require("./scoring");
 const { hashSeed } = require("./util/seeded-random");
 const historyStore = require("./history-store");
+const favoritesStore = require("./favorites-store");
+const regenerate = require("./regenerate");
+const exporter = require("./exporter");
 
 // ── lifecycle ──
 
@@ -253,20 +256,123 @@ async function generateFromLink(input) {
   return response;
 }
 
-// ── minimal exports (Step 4b에서 확장) ──
+// ── stores lifecycle ──
+
+function initFavorites(userDataPath) {
+  favoritesStore.init(userDataPath);
+}
+
+function initStores(userDataPath) {
+  initHistory(userDataPath);
+  initFavorites(userDataPath);
+}
+
+// ── history ──
 
 function getHistory(limit = 20) {
   return historyStore.list({ limit });
 }
+
+function getHistoryDetail(id) {
+  return historyStore.get(id);
+}
+
+function removeHistory(id) {
+  return historyStore.remove(id);
+}
+
+// ── favorites ──
+
+function addFavorite(record) {
+  return favoritesStore.add(record);
+}
+
+function removeFavorite(id) {
+  return favoritesStore.remove(id);
+}
+
+function listFavorites() {
+  return favoritesStore.list();
+}
+
+function hasFavorite(id) {
+  return favoritesStore.has(id);
+}
+
+// ── regenerate (helper에 위임만) ──
+
+function regenerateAll(prevResponse, opts) {
+  return regenerate.regenerateAllSets(prevResponse, opts);
+}
+
+function regenerateSet(prevResponse, setKey, opts) {
+  return regenerate.regenerateSet(prevResponse, setKey, opts);
+}
+
+function regenerateTitle(prevResponse, setKey, opts) {
+  return regenerate.regenerateTitleOnly(prevResponse, setKey, opts);
+}
+
+function regenerateThumbnail(prevResponse, setKey, opts) {
+  return regenerate.regenerateThumbnailOnly(prevResponse, setKey, opts);
+}
+
+function regenerateTags(prevResponse, setKey, opts) {
+  return regenerate.regenerateTagsOnly(prevResponse, setKey, opts);
+}
+
+// ── export ──
+
+function exportJSON(response) {
+  return exporter.toJSON(response);
+}
+
+function exportCSV(response) {
+  return exporter.toCSV(response);
+}
+
+function exportTXT(response) {
+  return exporter.toTXT(response);
+}
+
+function suggestExportFilename(response, ext) {
+  return exporter.suggestFilename(response, ext);
+}
+
+// ── misc ──
 
 function healthCheck() {
   return { status: "ok", service: "SEO Creator Engine (Node.js)" };
 }
 
 module.exports = {
+  // generate
   generateFromManual,
   generateFromLink,
+  // regenerate
+  regenerateAll,
+  regenerateSet,
+  regenerateTitle,
+  regenerateThumbnail,
+  regenerateTags,
+  // favorites
+  initFavorites,
+  addFavorite,
+  removeFavorite,
+  listFavorites,
+  hasFavorite,
+  // history
   getHistory,
-  healthCheck,
+  getHistoryDetail,
+  removeHistory,
+  // export
+  exportJSON,
+  exportCSV,
+  exportTXT,
+  suggestExportFilename,
+  // stores
+  initStores,
   initHistory,
+  // misc
+  healthCheck,
 };
