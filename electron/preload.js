@@ -47,6 +47,7 @@ const api = {
   exportCSV: (response) => invoke("engine:export:csv", response),
   exportTXT: (response) => invoke("engine:export:txt", response),
   suggestExportFilename: (response, ext) => invoke("engine:export:filename", response, ext),
+  saveExport: (response, format) => invoke("engine:export:save", response, format),
 };
 
 contextBridge.exposeInMainWorld("electronAPI", api);

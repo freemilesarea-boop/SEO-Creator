@@ -227,6 +227,17 @@ export interface ElectronAPI {
     response: GenerationResponse,
     ext: string
   ) => Promise<IpcEnvelope<string>>;
+  saveExport: (
+    response: GenerationResponse,
+    format: ExportFormat
+  ) => Promise<IpcEnvelope<{ cancelled: boolean; filePath?: string }>>;
+}
+
+export type ExportFormat = "json" | "csv" | "txt";
+
+export interface SaveExportResult {
+  cancelled: boolean;
+  filePath?: string;
 }
 
 declare global {
@@ -394,4 +405,17 @@ export async function suggestExportFilename(
   ext: string
 ): Promise<string> {
   return unwrap(_api().suggestExportFilename(response, ext));
+}
+
+/**
+ * 사용자에게 저장 다이얼로그를 띄우고 응답을 파일로 저장한다.
+ * 사용자가 다이얼로그를 닫으면 { cancelled: true }, 저장에 성공하면
+ * { cancelled: false, filePath } 를 돌려준다. IPC envelope의 ok:false는
+ * 저장 실패(쓰기 오류 등)에서만 발생.
+ */
+export async function saveExport(
+  response: GenerationResponse,
+  format: ExportFormat
+): Promise<SaveExportResult> {
+  return unwrap(_api().saveExport(response, format));
 }

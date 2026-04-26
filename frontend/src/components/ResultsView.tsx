@@ -3,14 +3,15 @@
 import { useEffect, useState } from "react";
 import {
   RefreshCw, Loader2, BarChart3, Tag, Music2, Smile, MapPin,
-  Globe, Users, ChevronDown, ChevronUp, Star,
+  Globe, Users, ChevronDown, ChevronUp, Star, Download,
 } from "lucide-react";
-import type { GenerationResponse } from "@/lib/api";
+import type { GenerationResponse, ExportFormat } from "@/lib/api";
 import {
   regenerateAll,
   hasFavorite,
   addFavorite,
   removeFavorite,
+  saveExport,
 } from "@/lib/api";
 import ResultCard from "./ResultCard";
 
@@ -39,6 +40,7 @@ export default function ResultsView({
   const [showKeywords, setShowKeywords] = useState(false);
   const [favored, setFavored] = useState(false);
   const [favBusy, setFavBusy] = useState(false);
+  const [exporting, setExporting] = useState<ExportFormat | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -51,6 +53,23 @@ export default function ResultsView({
       .catch(() => { if (!cancelled) setFavored(false); });
     return () => { cancelled = true; };
   }, [data.generationId]);
+
+  const handleExport = async (format: ExportFormat) => {
+    if (exporting) return;
+    setExporting(format);
+    try {
+      const r = await saveExport(data, format);
+      if (r.cancelled) {
+        onToast("저장이 취소되었습니다");
+      } else {
+        onToast(`${format.toUpperCase()}로 저장되었습니다`);
+      }
+    } catch (e) {
+      onError(e instanceof Error ? e.message : "저장에 실패했습니다");
+    } finally {
+      setExporting(null);
+    }
+  };
 
   const toggleFavorite = async () => {
     if (!data.generationId || favBusy) return;
@@ -103,31 +122,59 @@ export default function ResultsView({
     <div className="space-y-8 animate-fade-in">
       {/* Analysis Summary */}
       <div className="card">
-        <div className="mb-4 flex items-center justify-between gap-2">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <h3 className="flex items-center gap-2 text-lg font-semibold text-zinc-100">
             <BarChart3 className="h-5 w-5 text-brand-400" />
             분석 결과 요약
           </h3>
-          <button
-            type="button"
-            onClick={toggleFavorite}
-            disabled={favBusy || !data.generationId}
-            className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs transition-colors disabled:opacity-50 ${
-              favored
-                ? "border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20"
-                : "border-zinc-700/60 bg-zinc-800/40 text-zinc-300 hover:bg-zinc-700/60"
-            }`}
-            title={favored ? "즐겨찾기 해제" : "즐겨찾기 추가"}
-          >
-            {favBusy ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <Star
-                className={`h-3.5 w-3.5 ${favored ? "fill-amber-300 text-amber-300" : ""}`}
-              />
-            )}
-            {favored ? "즐겨찾기됨" : "즐겨찾기"}
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={toggleFavorite}
+              disabled={favBusy || !data.generationId}
+              className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs transition-colors disabled:opacity-50 ${
+                favored
+                  ? "border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20"
+                  : "border-zinc-700/60 bg-zinc-800/40 text-zinc-300 hover:bg-zinc-700/60"
+              }`}
+              title={favored ? "즐겨찾기 해제" : "즐겨찾기 추가"}
+            >
+              {favBusy ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Star
+                  className={`h-3.5 w-3.5 ${favored ? "fill-amber-300 text-amber-300" : ""}`}
+                />
+              )}
+              {favored ? "즐겨찾기됨" : "즐겨찾기"}
+            </button>
+
+            <div className="inline-flex items-stretch rounded-md border border-zinc-700/60 bg-zinc-800/40 text-xs text-zinc-300 overflow-hidden">
+              <span className="inline-flex items-center gap-1 px-2 py-1 text-zinc-500">
+                <Download className="h-3.5 w-3.5" />
+                내보내기
+              </span>
+              {(["json", "csv", "txt"] as ExportFormat[]).map((fmt) => {
+                const isBusy = exporting === fmt;
+                const disabled = exporting !== null;
+                return (
+                  <button
+                    key={fmt}
+                    type="button"
+                    onClick={() => handleExport(fmt)}
+                    disabled={disabled}
+                    className="inline-flex items-center gap-1 border-l border-zinc-700/60 px-2 py-1 transition-colors hover:bg-zinc-700/60 disabled:opacity-50"
+                    title={`${fmt.toUpperCase()}로 저장`}
+                  >
+                    {isBusy ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : null}
+                    {fmt.toUpperCase()}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div className="flex items-start gap-3">

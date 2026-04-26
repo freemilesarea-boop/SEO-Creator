@@ -9,8 +9,9 @@
 
 "use strict";
 
-const { app, BrowserWindow, shell, ipcMain } = require("electron");
+const { app, BrowserWindow, shell, ipcMain, dialog } = require("electron");
 const path = require("path");
+const fs = require("fs");
 const engine = require("../engine");
 
 let mainWindow = null;
@@ -85,6 +86,51 @@ const _wrap = (fn) => async (_event, ...args) => {
   }
 };
 
+// ── export save (dialog + fs) ──
+//
+// engine 모듈이 텍스트만 만들고, 파일 저장 다이얼로그/디스크 IO는
+// main 프로세스가 책임진다. renderer는 saveExport(response, format)만
+// 호출하면 된다. 사용자가 다이얼로그를 닫으면
+// { cancelled: true } 를, 저장에 성공하면 { cancelled: false, filePath }를
+// 돌려준다 (둘 다 outer 정규화에서 ok:true로 감싸진다).
+
+const _FORMAT_LABELS = { json: "JSON", csv: "CSV", txt: "Text" };
+
+async function _saveExport(response, format) {
+  const fmt = String(format || "").toLowerCase();
+  if (!Object.prototype.hasOwnProperty.call(_FORMAT_LABELS, fmt)) {
+    throw new Error(`unsupported format: ${format}`);
+  }
+
+  const text =
+    fmt === "json" ? engine.exportJSON(response)
+    : fmt === "csv" ? engine.exportCSV(response)
+    : engine.exportTXT(response);
+
+  const defaultName = engine.suggestExportFilename(response, fmt);
+  const opts = {
+    defaultPath: defaultName,
+    filters: [
+      { name: _FORMAT_LABELS[fmt], extensions: [fmt] },
+      { name: "All Files", extensions: ["*"] },
+    ],
+  };
+
+  const win = mainWindow || BrowserWindow.getFocusedWindow() || null;
+  const result = win
+    ? await dialog.showSaveDialog(win, opts)
+    : await dialog.showSaveDialog(opts);
+
+  if (result.canceled || !result.filePath) {
+    return { cancelled: true };
+  }
+
+  // BOM은 붙이지 않는다 — Excel CSV의 한글 깨짐은 알려진 문제이지만,
+  // utf-8 + 일반 텍스트 에디터 호환을 우선한다.
+  await fs.promises.writeFile(result.filePath, text, { encoding: "utf8" });
+  return { cancelled: false, filePath: result.filePath };
+}
+
 function _registerHandlers() {
   // health (기존 호환 — 객체 직접 반환)
   ipcMain.handle("engine:health", () => engine.healthCheck());
@@ -123,6 +169,8 @@ function _registerHandlers() {
   ipcMain.handle("engine:export:txt",      _wrap((response) => engine.exportTXT(response)));
   ipcMain.handle("engine:export:filename",
     _wrap((response, ext) => engine.suggestExportFilename(response, ext)));
+  ipcMain.handle("engine:export:save",
+    _wrap((response, format) => _saveExport(response, format)));
 }
 
 // ── lifecycle ──
