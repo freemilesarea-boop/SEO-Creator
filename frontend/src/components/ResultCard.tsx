@@ -18,13 +18,47 @@ import {
   Zap,
   Shield,
   Hash,
+  CaseSensitive,
+  Camera,
+  Ban,
+  FileText,
+  Sparkles,
 } from "lucide-react";
-import type { ResultSet, TitleExplanation } from "@/lib/api";
+import type {
+  ResultSet,
+  TitleExplanation,
+  ScoreBreakdown,
+  DescriptionPack,
+  ThumbnailSuggestion,
+} from "@/lib/api";
 
 interface ResultCardProps {
   result: ResultSet;
   index: number;
   onToast: (msg: string) => void;
+}
+
+function BreakdownMini({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: number;
+  color: string;
+}) {
+  const v = Math.max(0, Math.min(100, Math.round(value || 0)));
+  return (
+    <div>
+      <div className="flex items-center justify-between text-[9px] uppercase tracking-wider text-zinc-500">
+        <span>{label}</span>
+        <span className="font-mono text-zinc-400">{v}</span>
+      </div>
+      <div className="mt-0.5 h-1 w-full overflow-hidden rounded-full bg-zinc-800">
+        <div className={`h-full ${color}`} style={{ width: `${v}%` }} />
+      </div>
+    </div>
+  );
 }
 
 function FragmentBadge({ type, text, reason }: { type: string; text: string; reason: string }) {
@@ -143,7 +177,15 @@ export default function ResultCard({ result, index, onToast }: ResultCardProps) 
   const hasPerson = thumb.hasPerson ?? thumb.has_person ?? false;
   const thumbLayout = thumb.layout ?? "";
   const textOverlay = thumb.textOverlay ?? thumb.text_overlay ?? "";
+  const fontFeel: string = thumb.fontFeel ?? thumb.font_feel ?? "";
+  const avoidList: string[] = thumb.avoidList ?? thumb.avoid_list ?? [];
+  const photoSearchKeywords: string[] =
+    thumb.photoSearchKeywords ?? thumb.photo_search_keywords ?? [];
   const explanation = r.explanation || null;
+  const breakdown: ScoreBreakdown | null = r.breakdown ?? null;
+  const descriptionPack: DescriptionPack | null =
+    r.descriptionPack ?? r.description_pack ?? null;
+  const usedKeywords: string[] = r.usedKeywords ?? r.used_keywords ?? [];
 
   const scoreColor =
     seoScore >= 80
@@ -190,6 +232,36 @@ export default function ResultCard({ result, index, onToast }: ResultCardProps) 
           </span>
         </div>
       </div>
+
+      {/* Score breakdown (per-set) */}
+      {breakdown && (
+        <div className="mb-4 grid grid-cols-3 gap-x-3 gap-y-2">
+          <BreakdownMini label="의도" value={breakdown.intentFit} color="bg-brand-500" />
+          <BreakdownMini label="키워드" value={breakdown.keywordCoverage} color="bg-sky-500" />
+          <BreakdownMini label="클릭" value={breakdown.titleClickability} color="bg-amber-500" />
+          <BreakdownMini label="태그" value={breakdown.tagQuality} color="bg-emerald-500" />
+          <BreakdownMini label="썸네일" value={breakdown.thumbnailRelevance} color="bg-fuchsia-500" />
+          <BreakdownMini label="다양성" value={breakdown.diversityBonus} color="bg-rose-500" />
+        </div>
+      )}
+
+      {/* Used keywords */}
+      {usedKeywords.length > 0 && (
+        <div className="mb-3 flex flex-wrap gap-1">
+          <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-zinc-500">
+            <Sparkles className="h-2.5 w-2.5" />
+            반영된 키워드
+          </span>
+          {usedKeywords.slice(0, 6).map((kw, i) => (
+            <span
+              key={`uk-${i}`}
+              className="rounded-md bg-zinc-800/70 px-2 py-0.5 text-[10px] text-zinc-300"
+            >
+              {kw}
+            </span>
+          ))}
+        </div>
+      )}
 
       {/* YT Music Title */}
       <div className="mb-3">
@@ -264,7 +336,7 @@ export default function ResultCard({ result, index, onToast }: ResultCardProps) 
       )}
 
       {/* Thumbnail Suggestion */}
-      <div className="mt-auto rounded-lg border border-zinc-800 bg-zinc-950/50 p-4">
+      <div className="rounded-lg border border-zinc-800 bg-zinc-950/50 p-4">
         <div className="mb-3 flex items-center gap-1.5 text-xs font-medium text-zinc-400">
           <Image className="h-3 w-3" />
           썸네일 컨셉 제안
@@ -306,8 +378,81 @@ export default function ResultCard({ result, index, onToast }: ResultCardProps) 
             <User className="h-3 w-3 shrink-0 text-zinc-500" />
             <span className="text-xs text-zinc-500">인물 포함: {hasPerson ? "예" : "아니오"}</span>
           </div>
+
+          {fontFeel && (
+            <div className="flex items-start gap-2">
+              <CaseSensitive className="mt-0.5 h-3 w-3 shrink-0 text-zinc-500" />
+              <span className="text-xs text-zinc-400">폰트 느낌: {fontFeel}</span>
+            </div>
+          )}
+
+          {photoSearchKeywords.length > 0 && (
+            <div className="flex items-start gap-2">
+              <Camera className="mt-0.5 h-3 w-3 shrink-0 text-zinc-500" />
+              <div className="flex flex-wrap gap-1">
+                {photoSearchKeywords.slice(0, 6).map((k, i) => (
+                  <span
+                    key={`pk-${i}`}
+                    className="rounded bg-sky-500/10 px-1.5 py-0.5 text-[10px] text-sky-300"
+                  >
+                    {k}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {avoidList.length > 0 && (
+            <div className="flex items-start gap-2">
+              <Ban className="mt-0.5 h-3 w-3 shrink-0 text-rose-400/80" />
+              <span className="text-[11px] leading-relaxed text-rose-300/80">
+                피하기: {avoidList.slice(0, 4).join(" · ")}
+              </span>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Description / Tags / Hashtags */}
+      {descriptionPack && (descriptionPack.description ||
+        (descriptionPack.tags && descriptionPack.tags.length) ||
+        (descriptionPack.hashtags && descriptionPack.hashtags.length)) && (
+        <div className="mt-3 space-y-2 rounded-lg border border-zinc-800/60 bg-zinc-950/40 p-3">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-zinc-400">
+            <FileText className="h-3 w-3" />
+            설명 / 태그 / 해시태그
+          </div>
+          {descriptionPack.description && (
+            <p className="whitespace-pre-line text-[11px] leading-relaxed text-zinc-400 line-clamp-5">
+              {descriptionPack.description}
+            </p>
+          )}
+          {descriptionPack.tags && descriptionPack.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {descriptionPack.tags.slice(0, 12).map((t, i) => (
+                <span
+                  key={`tag-${i}`}
+                  className="rounded bg-zinc-800/80 px-1.5 py-0.5 text-[10px] text-zinc-300"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
+          {descriptionPack.hashtags && descriptionPack.hashtags.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {descriptionPack.hashtags.slice(0, 8).map((h, i) => (
+                <span
+                  key={`hh-${i}`}
+                  className="rounded bg-brand-500/10 px-1.5 py-0.5 text-[10px] text-brand-300"
+                >
+                  {h}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
