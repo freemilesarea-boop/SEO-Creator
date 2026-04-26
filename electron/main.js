@@ -135,6 +135,9 @@ function _registerHandlers() {
   // health (기존 호환 — 객체 직접 반환)
   ipcMain.handle("engine:health", () => engine.healthCheck());
 
+  // app meta
+  ipcMain.handle("engine:app:version", _wrap(() => app.getVersion()));
+
   // generate (기존 채널 + 호환 형태 유지)
   ipcMain.handle("engine:generateManual", _wrap((input) => engine.generateFromManual(input)));
   ipcMain.handle("engine:generateLink", _wrap((input) => engine.generateFromLink(input)));

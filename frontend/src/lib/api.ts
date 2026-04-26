@@ -177,6 +177,7 @@ export interface ElectronAPI {
   platform: string;
 
   healthCheck: () => Promise<{ status: string; service: string }>;
+  getAppVersion: () => Promise<IpcEnvelope<string>>;
 
   // generate
   generateManual: (input: ManualInput) => Promise<IpcEnvelope<GenerationResponse>>;
@@ -305,6 +306,21 @@ export async function regenerate(
 
 export async function getHistory(): Promise<HistoryListItem[]> {
   return unwrap(_api().getHistory(20));
+}
+
+/**
+ * 앱 버전을 안전하게 반환한다.
+ * - Electron 환경: app.getVersion() (= package.json `version`)
+ * - 그 외 (Next dev server 직접 접속 등): "dev"
+ * - IPC 실패 시에도 throw 하지 않고 "dev" 반환.
+ */
+export async function getAppVersion(): Promise<string> {
+  if (!isElectron || !window.electronAPI) return "dev";
+  try {
+    return await unwrap(window.electronAPI.getAppVersion());
+  } catch {
+    return "dev";
+  }
 }
 
 // ── Regenerate (Step 6b) ──

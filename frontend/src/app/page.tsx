@@ -7,7 +7,7 @@ import ManualInputForm from "@/components/ManualInputForm";
 import ResultsView from "@/components/ResultsView";
 import HistoryPanel from "@/components/HistoryPanel";
 import FavoritesPanel from "@/components/FavoritesPanel";
-import type { GenerationResponse } from "@/lib/api";
+import { getAppVersion, type GenerationResponse } from "@/lib/api";
 
 type Tab = "link" | "manual";
 
@@ -24,6 +24,15 @@ export default function HomePage() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [historyKey, setHistoryKey] = useState(0);
   const [favoritesKey, setFavoritesKey] = useState(0);
+  const [appVersion, setAppVersion] = useState<string>("");
+
+  useEffect(() => {
+    let cancelled = false;
+    getAppVersion()
+      .then((v) => { if (!cancelled) setAppVersion(v); })
+      .catch(() => { if (!cancelled) setAppVersion("dev"); });
+    return () => { cancelled = true; };
+  }, []);
 
   const addToast = useCallback((message: string, type: "success" | "error" = "success") => {
     const id = Date.now();
@@ -219,6 +228,9 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="border-t border-zinc-900 py-6 text-center text-xs text-zinc-600">
         SEO Creator &mdash; YouTube 플레이리스트 SEO 최적화 도구
+        {appVersion && (
+          <span className="ml-2 text-zinc-700">v{appVersion}</span>
+        )}
       </footer>
     </div>
   );

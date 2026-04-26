@@ -17,8 +17,9 @@ const api = {
   isElectron: true,
   platform: process.platform,
 
-  // health
+  // health + app meta
   healthCheck: () => invoke("engine:health"),
+  getAppVersion: () => invoke("engine:app:version"),
 
   // generate (기존 호환)
   generateManual: (input) => invoke("engine:generateManual", input),
