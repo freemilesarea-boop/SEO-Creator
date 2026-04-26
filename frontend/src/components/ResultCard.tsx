@@ -23,6 +23,10 @@ import {
   Ban,
   FileText,
   Sparkles,
+  RefreshCw,
+  Loader2,
+  Wand2,
+  ClipboardCopy,
 } from "lucide-react";
 import type {
   ResultSet,
@@ -30,12 +34,56 @@ import type {
   ScoreBreakdown,
   DescriptionPack,
   ThumbnailSuggestion,
+  GenerationResponse,
+} from "@/lib/api";
+import {
+  regenerateSet as apiRegenerateSet,
+  regenerateTitle as apiRegenerateTitle,
+  regenerateThumbnail as apiRegenerateThumbnail,
+  regenerateTags as apiRegenerateTags,
 } from "@/lib/api";
 
 interface ResultCardProps {
   result: ResultSet;
   index: number;
   onToast: (msg: string) => void;
+  /** 카드 내부 단일 세트 재생성에 필요한 직전 응답 전체. */
+  prevResponse?: GenerationResponse;
+  /** 재생성 결과를 부모로 전파. 없으면 액션 버튼은 숨김. */
+  onUpdate?: (next: GenerationResponse) => void;
+  /** 액션 실패 시 사용자에게 알림. 없으면 onToast로 fallback. */
+  onError?: (msg: string) => void;
+}
+
+type RegenKind = "title" | "thumbnail" | "tags" | "set";
+
+function ActionButton({
+  kind,
+  busy,
+  onClick,
+  icon,
+  label,
+}: {
+  kind: RegenKind;
+  busy: RegenKind | null;
+  onClick: () => void;
+  icon: React.ReactNode;
+  label: string;
+}) {
+  const isBusy = busy === kind;
+  const disabled = busy !== null;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="inline-flex items-center gap-1 rounded-md border border-zinc-700/60 bg-zinc-800/40 px-2 py-1 text-[11px] text-zinc-300 transition-colors hover:bg-zinc-700/60 disabled:opacity-50"
+      title={`${label} 재생성`}
+    >
+      {isBusy ? <Loader2 className="h-3 w-3 animate-spin" /> : icon}
+      {label}
+    </button>
+  );
 }
 
 function BreakdownMini({
@@ -148,9 +196,23 @@ function ExplanationPanel({ explanation, label }: { explanation: TitleExplanatio
   );
 }
 
-export default function ResultCard({ result, index, onToast }: ResultCardProps) {
+export default function ResultCard({
+  result,
+  index,
+  onToast,
+  prevResponse,
+  onUpdate,
+  onError,
+}: ResultCardProps) {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [busy, setBusy] = useState<RegenKind | null>(null);
+  const [copyingAll, setCopyingAll] = useState(false);
+
+  const reportError = (msg: string) => {
+    if (onError) onError(msg);
+    else onToast(msg);
+  };
 
   const copyToClipboard = async (text: string, field: string) => {
     try {
@@ -186,6 +248,74 @@ export default function ResultCard({ result, index, onToast }: ResultCardProps) 
   const descriptionPack: DescriptionPack | null =
     r.descriptionPack ?? r.description_pack ?? null;
   const usedKeywords: string[] = r.usedKeywords ?? r.used_keywords ?? [];
+  const setKey: string | undefined = r.setKey ?? r.set_key ?? undefined;
+
+  const hasUpdater = Boolean(prevResponse) && typeof onUpdate === "function";
+  const canRegen = hasUpdater && Boolean(setKey);
+
+  const runRegen = async (kind: RegenKind) => {
+    if (!prevResponse || !onUpdate || !setKey) return;
+    setBusy(kind);
+    try {
+      let next: GenerationResponse;
+      if (kind === "title") next = await apiRegenerateTitle(prevResponse, setKey);
+      else if (kind === "thumbnail") next = await apiRegenerateThumbnail(prevResponse, setKey);
+      else if (kind === "tags") next = await apiRegenerateTags(prevResponse, setKey);
+      else next = await apiRegenerateSet(prevResponse, setKey);
+      onUpdate(next);
+      const msg =
+        kind === "title" ? "제목을 새로 생성했습니다" :
+        kind === "thumbnail" ? "썸네일을 새로 생성했습니다" :
+        kind === "tags" ? "태그/설명을 새로 생성했습니다" :
+        "세트를 새로 생성했습니다";
+      onToast(msg);
+    } catch (e) {
+      reportError(e instanceof Error ? e.message : "재생성에 실패했습니다");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const copyCard = async () => {
+    setCopyingAll(true);
+    try {
+      const lines: string[] = [];
+      lines.push(`[${setLabel}] SEO ${Number(seoScore).toFixed(1)}`);
+      lines.push("");
+      lines.push("YT Music:");
+      lines.push(ytMusicTitle);
+      lines.push("");
+      lines.push("YT Playlist:");
+      lines.push(ytPlaylistTitle);
+      if (descriptionPack?.description) {
+        lines.push("");
+        lines.push("설명:");
+        lines.push(descriptionPack.description);
+      }
+      if (descriptionPack?.tags?.length) {
+        lines.push("");
+        lines.push(`태그: ${descriptionPack.tags.join(", ")}`);
+      }
+      if (descriptionPack?.hashtags?.length) {
+        lines.push(`해시태그: ${descriptionPack.hashtags.join(" ")}`);
+      }
+      lines.push("");
+      lines.push("썸네일:");
+      if (bgConcept) lines.push(`- 배경: ${bgConcept}`);
+      if (thumbLayout) lines.push(`- 레이아웃: ${thumbLayout}`);
+      if (textOverlay) lines.push(`- 오버레이: ${textOverlay}`);
+      if (fontFeel) lines.push(`- 폰트: ${fontFeel}`);
+      if (colorTone.length) lines.push(`- 컬러: ${colorTone.join(", ")}`);
+      if (avoidList.length) lines.push(`- 피하기: ${avoidList.slice(0, 5).join(" · ")}`);
+      if (photoSearchKeywords.length) lines.push(`- 사진 키워드: ${photoSearchKeywords.join(", ")}`);
+      await navigator.clipboard.writeText(lines.join("\n"));
+      onToast("카드 전체가 복사되었습니다");
+    } catch {
+      reportError("복사에 실패했습니다");
+    } finally {
+      setCopyingAll(false);
+    }
+  };
 
   const scoreColor =
     seoScore >= 80
@@ -450,6 +580,60 @@ export default function ResultCard({ result, index, onToast }: ResultCardProps) 
                 </span>
               ))}
             </div>
+          )}
+        </div>
+      )}
+
+      {/* Per-card actions (Step 7b) */}
+      {hasUpdater && (
+        <div className="mt-3 flex flex-wrap gap-1.5 border-t border-zinc-800/60 pt-3">
+          {hasUpdater && (
+            <button
+              type="button"
+              onClick={copyCard}
+              disabled={copyingAll}
+              className="inline-flex items-center gap-1 rounded-md border border-zinc-700/60 bg-zinc-800/40 px-2 py-1 text-[11px] text-zinc-300 transition-colors hover:bg-zinc-700/60 disabled:opacity-50"
+              title="카드 전체 복사"
+            >
+              {copyingAll ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <ClipboardCopy className="h-3 w-3" />
+              )}
+              카드 복사
+            </button>
+          )}
+          {canRegen && (
+            <>
+              <ActionButton
+                kind="title"
+                busy={busy}
+                onClick={() => runRegen("title")}
+                icon={<Wand2 className="h-3 w-3" />}
+                label="제목"
+              />
+              <ActionButton
+                kind="thumbnail"
+                busy={busy}
+                onClick={() => runRegen("thumbnail")}
+                icon={<Image className="h-3 w-3" />}
+                label="썸네일"
+              />
+              <ActionButton
+                kind="tags"
+                busy={busy}
+                onClick={() => runRegen("tags")}
+                icon={<Hash className="h-3 w-3" />}
+                label="태그/설명"
+              />
+              <ActionButton
+                kind="set"
+                busy={busy}
+                onClick={() => runRegen("set")}
+                icon={<RefreshCw className="h-3 w-3" />}
+                label="세트 전체"
+              />
+            </>
           )}
         </div>
       )}

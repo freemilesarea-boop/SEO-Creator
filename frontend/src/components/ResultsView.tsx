@@ -6,7 +6,7 @@ import {
   Globe, Users, ChevronDown, ChevronUp,
 } from "lucide-react";
 import type { GenerationResponse } from "@/lib/api";
-import { regenerate } from "@/lib/api";
+import { regenerateAll } from "@/lib/api";
 import ResultCard from "./ResultCard";
 
 // dual-compat helper: camelCase or snake_case
@@ -28,7 +28,7 @@ export default function ResultsView({ data, onRegenerate, onToast, onError }: Re
   const handleRegenerate = async () => {
     setRegenerating(true);
     try {
-      const result = await regenerate(g(data, "generationId", "generation_id"));
+      const result = await regenerateAll(data);
       onRegenerate(result);
       onToast("새로운 결과가 생성되었습니다!");
     } catch (err) {
@@ -154,7 +154,15 @@ export default function ResultsView({ data, onRegenerate, onToast, onError }: Re
         </div>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
           {data.results.map((result, i) => (
-            <ResultCard key={i} result={result} index={i} onToast={onToast} />
+            <ResultCard
+              key={i}
+              result={result}
+              index={i}
+              onToast={onToast}
+              prevResponse={data}
+              onUpdate={onRegenerate}
+              onError={onError}
+            />
           ))}
         </div>
       </div>
