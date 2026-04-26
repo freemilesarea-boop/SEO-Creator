@@ -17,11 +17,10 @@
     "test:engine": "node scripts/test-engine.js",
     "postinstall": "cd frontend && npm install --prefer-offline --no-audit"
   },
-  "dependencies": {},
   "devDependencies": {
     "concurrently": "^9.1.0",
     "cross-env": "^7.0.3",
-    "electron": "^33.2.0",
+    "electron": "^33.4.11",
     "electron-builder": "^25.1.8",
     "wait-on": "^8.0.1"
   },
@@ -51,7 +50,10 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64", "arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         }
       ],
       "darkModeSupport": true,
@@ -60,8 +62,16 @@
     "dmg": {
       "title": "SEO Creator",
       "contents": [
-        { "x": 130, "y": 220 },
-        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
       ]
     },
     "win": {
@@ -69,7 +79,9 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ]
     },
@@ -78,7 +90,9 @@
       "allowToChangeInstallationDirectory": true
     },
     "linux": {
-      "target": ["AppImage"],
+      "target": [
+        "AppImage"
+      ],
       "category": "Utility"
     }
   }
