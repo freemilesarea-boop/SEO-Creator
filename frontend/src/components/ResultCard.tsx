@@ -57,6 +57,17 @@ interface ResultCardProps {
 
 type RegenKind = "title" | "thumbnail" | "tags" | "set";
 
+const REGEN_TONE: Record<RegenKind, string> = {
+  title:
+    "border-amber-500/40 bg-amber-500/10 text-amber-200 hover:bg-amber-500/20 hover:border-amber-400",
+  thumbnail:
+    "border-sky-500/40 bg-sky-500/10 text-sky-200 hover:bg-sky-500/20 hover:border-sky-400",
+  tags:
+    "border-emerald-500/40 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/20 hover:border-emerald-400",
+  set:
+    "border-brand-500/50 bg-brand-500/15 text-brand-100 hover:bg-brand-500/25 hover:border-brand-400 font-semibold",
+};
+
 function ActionButton({
   kind,
   busy,
@@ -77,7 +88,7 @@ function ActionButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="inline-flex items-center gap-1 rounded-md border border-zinc-700/60 bg-zinc-800/40 px-2 py-1 text-[11px] text-zinc-300 transition-colors hover:bg-zinc-700/60 disabled:opacity-50"
+      className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] transition-all duration-150 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100 ${REGEN_TONE[kind]}`}
       title={`${label} 재생성`}
     >
       {isBusy ? <Loader2 className="h-3 w-3 animate-spin" /> : icon}
@@ -206,6 +217,7 @@ export default function ResultCard({
 }: ResultCardProps) {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [showBreakdown, setShowBreakdown] = useState(false);
   const [busy, setBusy] = useState<RegenKind | null>(null);
   const [copyingAll, setCopyingAll] = useState(false);
 
@@ -334,15 +346,22 @@ export default function ResultCard({
 
   return (
     <div
-      className="card animate-fade-in flex flex-col"
-      style={{ animationDelay: `${index * 100}ms` }}
+      className="card-interactive animate-result-pop flex flex-col"
+      style={{ animationDelay: `${index * 120}ms` }}
     >
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <span className="rounded-full bg-brand-600/20 px-3 py-1 text-sm font-medium text-brand-300">
           {setLabel}
         </span>
-        <div className="relative flex items-center justify-center">
+        <button
+          type="button"
+          onClick={() => breakdown && setShowBreakdown((v) => !v)}
+          disabled={!breakdown}
+          className="group relative flex items-center justify-center rounded-full transition-transform duration-200 hover:scale-105 disabled:cursor-default disabled:opacity-90"
+          aria-expanded={showBreakdown}
+          title={breakdown ? (showBreakdown ? "점수 상세 접기" : "점수 상세 보기") : "점수 정보 없음"}
+        >
           <svg width="64" height="64" className="-rotate-90">
             <circle cx="32" cy="32" r="26" fill="none" stroke="currentColor" strokeWidth="4" className="text-zinc-800" />
             <circle
@@ -356,18 +375,32 @@ export default function ResultCard({
           <span className={`absolute text-xs font-bold ${scoreColor.split(" ")[0]}`}>
             {seoScore.toFixed(0)}
           </span>
-        </div>
+          {breakdown && (
+            <span className="absolute -bottom-1 -right-1 rounded-full bg-zinc-800 p-0.5 text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100">
+              {showBreakdown ? (
+                <ChevronUp className="h-2.5 w-2.5" />
+              ) : (
+                <ChevronDown className="h-2.5 w-2.5" />
+              )}
+            </span>
+          )}
+        </button>
       </div>
 
-      {/* Score breakdown (per-set) */}
-      {breakdown && (
-        <div className="mb-4 grid grid-cols-3 gap-x-3 gap-y-2">
-          <BreakdownMini label="의도" value={breakdown.intentFit} color="bg-brand-500" />
-          <BreakdownMini label="키워드" value={breakdown.keywordCoverage} color="bg-sky-500" />
-          <BreakdownMini label="클릭" value={breakdown.titleClickability} color="bg-amber-500" />
-          <BreakdownMini label="태그" value={breakdown.tagQuality} color="bg-emerald-500" />
-          <BreakdownMini label="썸네일" value={breakdown.thumbnailRelevance} color="bg-fuchsia-500" />
-          <BreakdownMini label="다양성" value={breakdown.diversityBonus} color="bg-rose-500" />
+      {/* Score breakdown — 점수 도넛 클릭으로 토글 */}
+      {breakdown && showBreakdown && (
+        <div className="mb-4 animate-fade-in rounded-lg border border-zinc-800/60 bg-zinc-950/40 p-3">
+          <div className="mb-2 text-[10px] uppercase tracking-wider text-zinc-500">
+            점수 구성
+          </div>
+          <div className="grid grid-cols-2 gap-x-3 gap-y-2 sm:grid-cols-3">
+            <BreakdownMini label="제목 (CTR)" value={breakdown.titleClickability} color="bg-amber-500" />
+            <BreakdownMini label="검색 의도" value={breakdown.intentFit} color="bg-brand-500" />
+            <BreakdownMini label="키워드" value={breakdown.keywordCoverage} color="bg-sky-500" />
+            <BreakdownMini label="태그" value={breakdown.tagQuality} color="bg-emerald-500" />
+            <BreakdownMini label="썸네일" value={breakdown.thumbnailRelevance} color="bg-fuchsia-500" />
+            <BreakdownMini label="다양성" value={breakdown.diversityBonus} color="bg-rose-500" />
+          </div>
         </div>
       )}
 

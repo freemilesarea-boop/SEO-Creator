@@ -129,8 +129,16 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-zinc-100 sm:text-2xl">
-                <span className="text-brand-400">SEO</span> Creator
+              <h1 className="flex items-center gap-2 text-xl font-bold tracking-tight text-zinc-100 sm:text-2xl">
+                <span>
+                  <span className="text-brand-400">SEO</span> Creator
+                </span>
+                {appVersion && appVersion !== "dev" && (
+                  <span className="badge-new" title={`v${appVersion}`}>
+                    <span className="h-1.5 w-1.5 rounded-full bg-brand-400 animate-pulse-ring" />
+                    v2.1 NEW
+                  </span>
+                )}
               </h1>
               <p className="mt-0.5 text-xs text-zinc-500 sm:text-sm">
                 플레이리스트 SEO · 썸네일 생성기

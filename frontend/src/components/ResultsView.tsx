@@ -121,20 +121,24 @@ export default function ResultsView({
   );
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      {/* Analysis Summary */}
-      <div className="card">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-          <h3 className="flex items-center gap-2 text-lg font-semibold text-zinc-100">
-            <BarChart3 className="h-5 w-5 text-brand-400" />
-            분석 결과 요약
-          </h3>
+    <div className="space-y-6 animate-results-enter">
+      {/* Sticky action bar */}
+      <div className="sticky top-[72px] z-30 -mx-4 mb-2 px-4 sm:-mx-6 sm:px-6">
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-zinc-800/80 bg-zinc-950/80 px-3 py-2 shadow-lg backdrop-blur-lg">
+          <div className="flex items-center gap-2 text-xs text-zinc-400">
+            <BarChart3 className="h-4 w-4 text-brand-400" />
+            <span className="font-medium text-zinc-200">결과</span>
+            <span className="hidden text-zinc-600 sm:inline">·</span>
+            <span className="hidden truncate text-zinc-500 sm:inline">
+              {a.primaryGenre} / {a.primaryMood} / {a.primarySituation}
+            </span>
+          </div>
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={toggleFavorite}
               disabled={favBusy || !data.generationId}
-              className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs transition-colors disabled:opacity-50 ${
+              className={`pill-action ${
                 favored
                   ? "border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20"
                   : "border-zinc-700/60 bg-zinc-800/40 text-zinc-300 hover:bg-zinc-700/60"
@@ -151,7 +155,7 @@ export default function ResultsView({
               {favored ? "즐겨찾기됨" : "즐겨찾기"}
             </button>
 
-            <div className="inline-flex items-stretch rounded-md border border-zinc-700/60 bg-zinc-800/40 text-xs text-zinc-300 overflow-hidden">
+            <div className="inline-flex items-stretch overflow-hidden rounded-md border border-zinc-700/60 bg-zinc-800/40 text-xs text-zinc-300">
               <span className="inline-flex items-center gap-1 px-2 py-1 text-zinc-500">
                 <Download className="h-3.5 w-3.5" />
                 내보내기
@@ -168,16 +172,41 @@ export default function ResultsView({
                     className="inline-flex items-center gap-1 border-l border-zinc-700/60 px-2 py-1 transition-colors hover:bg-zinc-700/60 disabled:opacity-50"
                     title={`${fmt.toUpperCase()}로 저장`}
                   >
-                    {isBusy ? (
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                    ) : null}
+                    {isBusy ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
                     {fmt.toUpperCase()}
                   </button>
                 );
               })}
             </div>
+
+            <button
+              onClick={handleRegenerate}
+              disabled={regenerating}
+              className="pill-action border-brand-500/40 bg-brand-500/10 text-brand-200 hover:bg-brand-500/20"
+              title="모든 세트를 새로 생성"
+            >
+              {regenerating ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  재생성 중...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="h-3.5 w-3.5" />
+                  전체 재생성
+                </>
+              )}
+            </button>
           </div>
         </div>
+      </div>
+
+      {/* Analysis Summary */}
+      <div className="card">
+        <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-zinc-100">
+          <BarChart3 className="h-5 w-5 text-brand-400" />
+          분석 결과 요약
+        </h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div className="flex items-start gap-3">
             <Music2 className="mt-0.5 h-4 w-4 shrink-0 text-brand-400" />
@@ -275,10 +304,12 @@ export default function ResultsView({
       {/* Result Cards */}
       <div>
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-zinc-100">생성 결과 ({data.results.length}개)</h3>
-          <button onClick={handleRegenerate} disabled={regenerating} className="btn-secondary">
-            {regenerating ? (<><Loader2 className="h-3.5 w-3.5 animate-spin" />재생성 중...</>) : (<><RefreshCw className="h-3.5 w-3.5" />재생성</>)}
-          </button>
+          <h3 className="text-lg font-semibold text-zinc-100">
+            생성 결과 ({data.results.length}개)
+          </h3>
+          <span className="text-[11px] text-zinc-500">
+            카드별 재생성은 카드 하단에서 · 전체 재생성은 상단 액션바에서
+          </span>
         </div>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
           {data.results.map((result, i) => (

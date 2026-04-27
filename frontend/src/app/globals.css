@@ -67,6 +67,24 @@
   .card {
     @apply rounded-xl border border-zinc-800 bg-zinc-900/80 p-6 shadow-lg;
   }
+
+  .card-interactive {
+    @apply card transition-all duration-200
+           hover:-translate-y-0.5 hover:border-zinc-700
+           hover:shadow-2xl hover:shadow-brand-500/5;
+  }
+
+  .badge-new {
+    @apply inline-flex items-center gap-1 rounded-full
+           border border-brand-500/40 bg-brand-500/10 px-2 py-0.5
+           text-[10px] font-semibold uppercase tracking-wider text-brand-300;
+  }
+
+  .pill-action {
+    @apply inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1
+           text-xs transition-all duration-150
+           disabled:opacity-50;
+  }
 }
 
 @keyframes spin-slow {
@@ -103,4 +121,37 @@
 
 .animate-toast-out {
   animation: toast-out 0.3s ease-in forwards;
+}
+
+/* 결과 카드 등장 — staggered fade-up + scale-in */
+@keyframes result-pop {
+  0%   { opacity: 0; transform: translateY(18px) scale(0.96); }
+  60%  { opacity: 1; transform: translateY(-2px) scale(1.005); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.animate-result-pop {
+  animation: result-pop 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 0;
+}
+
+/* 결과 컨테이너 자체의 부드러운 진입 */
+@keyframes results-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-results-enter {
+  animation: results-enter 0.35s ease-out forwards;
+}
+
+/* 점수 도넛 클릭 강조 */
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.45); }
+  70%  { box-shadow: 0 0 0 8px rgba(167, 139, 250, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0); }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 1.4s ease-out infinite;
 }
