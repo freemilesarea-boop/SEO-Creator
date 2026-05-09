@@ -85,7 +85,7 @@ function ExplanationPanel({ explanation, label }: { explanation: TitleExplanatio
       {/* 메타 정보 */}
       <div className="flex flex-wrap gap-2 text-[10px]">
         <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-400">
-          {typeLabel[explanation.keyword_type] || explanation.keyword_type}
+          {typeLabel[explanation.keywordType] || explanation.keywordType}
         </span>
         <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-400">
           {intentLabel[explanation.intent] || explanation.intent}
@@ -129,21 +129,20 @@ export default function ResultCard({ result, index, onToast }: ResultCardProps) 
     }
   };
 
-  // Support both camelCase (IPC) and snake_case (API) field names
-  const r: any = result;
-  const seoScore = r.seoScore ?? r.seo_score ?? 0;
-  const setLabel = r.setLabel ?? r.set_label ?? "";
-  const ytMusicTitle = r.ytMusicTitle ?? r.yt_music_title ?? "";
-  const ytPlaylistTitle = r.ytPlaylistTitle ?? r.yt_playlist_title ?? "";
-  const thumb = r.thumbnail || {};
-  const mainKeywords = thumb.mainKeywords ?? thumb.main_keywords ?? [];
-  const subKeywords = thumb.subKeywords ?? thumb.sub_keywords ?? [];
-  const colorTone = thumb.colorTone ?? thumb.color_tone ?? [];
-  const bgConcept = thumb.backgroundConcept ?? thumb.background_concept ?? "";
-  const hasPerson = thumb.hasPerson ?? thumb.has_person ?? false;
+  // Engine 응답은 camelCase로 통일됨
+  const seoScore = result.seoScore ?? 0;
+  const setLabel = result.setLabel ?? "";
+  const ytMusicTitle = result.ytMusicTitle ?? "";
+  const ytPlaylistTitle = result.ytPlaylistTitle ?? "";
+  const thumb = result.thumbnail || ({} as Partial<typeof result.thumbnail>);
+  const mainKeywords = thumb.mainKeywords ?? [];
+  const subKeywords = thumb.subKeywords ?? [];
+  const colorTone = thumb.colorTone ?? [];
+  const bgConcept = thumb.backgroundConcept ?? "";
+  const hasPerson = thumb.hasPerson ?? false;
   const thumbLayout = thumb.layout ?? "";
-  const textOverlay = thumb.textOverlay ?? thumb.text_overlay ?? "";
-  const explanation = r.explanation || null;
+  const textOverlay = thumb.textOverlay ?? "";
+  const explanation = result.explanation || null;
 
   const scoreColor =
     seoScore >= 80
@@ -161,8 +160,8 @@ export default function ResultCard({ result, index, onToast }: ResultCardProps) 
 
   const hasExplanation =
     explanation &&
-    (explanation.yt_music_explanation?.title ||
-      explanation.yt_playlist_explanation?.title);
+    (explanation.ytMusicExplanation?.title ||
+      explanation.ytPlaylistExplanation?.title);
 
   return (
     <div
@@ -250,12 +249,12 @@ export default function ResultCard({ result, index, onToast }: ResultCardProps) 
           {showExplanation && explanation && (
             <div className="mt-3 space-y-4 rounded-lg border border-zinc-800/80 bg-zinc-950/60 p-4 animate-fade-in">
               <ExplanationPanel
-                explanation={explanation.yt_music_explanation}
+                explanation={explanation.ytMusicExplanation}
                 label="YT Music 제목"
               />
               <div className="border-t border-zinc-800/50" />
               <ExplanationPanel
-                explanation={explanation.yt_playlist_explanation}
+                explanation={explanation.ytPlaylistExplanation}
                 label="YT Playlist 제목"
               />
             </div>

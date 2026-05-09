@@ -15,5 +15,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
   generateLink: (input) => ipcRenderer.invoke("engine:generateLink", input),
 
+  regenerate: (generationId) => ipcRenderer.invoke("engine:regenerate", generationId),
+
   getHistory: (limit) => ipcRenderer.invoke("engine:getHistory", limit),
 });

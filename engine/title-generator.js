@@ -126,7 +126,27 @@ function _makePair(kws, genre, lang, sit, moodKey, genreKey) {
   return [ytm, ytp];
 }
 
-function generateTitleSets(analysis, keywordScores, language) {
+// seed 기반 결정론적 셔플 (mulberry32)
+function _seedShuffle(arr, seed) {
+  if (!seed || arr.length <= 1) return arr;
+  let s = (seed >>> 0) || 1;
+  const rand = () => {
+    s = (s + 0x6D2B79F5) >>> 0;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  const out = arr.slice();
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+function generateTitleSets(analysis, keywordScores, language, opts = {}) {
+  const seed = opts.seed | 0;
   const sit = analysis.primarySituation;
   const genre = pickDisplayKeyword(analysis.primaryGenre, "genres", language);
   const compatMood = pickCompatibleMood(sit, analysis.detectedMoods);
@@ -143,6 +163,20 @@ function generateTitleSets(analysis, keywordScores, language) {
   let ytpMood = _filterByIntentPolicy(ytpPool, "emotional", sit);
   ytmMood.sort((a, b) => _purity(b, "emotional") - _purity(a, "emotional"));
   ytpMood.sort((a, b) => _purity(b, "emotional") - _purity(a, "emotional"));
+
+  // 재생성 시 동일 purity 그룹 내에서 셔플하여 다양성 확보
+  if (seed) {
+    // 가장 높은 purity 점수를 가진 candidate만 추려 그 안에서 셔플
+    const topPurityYtm = ytmMood.length ? _purity(ytmMood[0], "emotional") : 0;
+    const headYtm = ytmMood.filter(t => _purity(t, "emotional") === topPurityYtm);
+    const tailYtm = ytmMood.filter(t => _purity(t, "emotional") !== topPurityYtm);
+    ytmMood = [..._seedShuffle(headYtm, seed ^ 0x1111), ...tailYtm];
+
+    const topPurityYtp = ytpMood.length ? _purity(ytpMood[0], "emotional") : 0;
+    const headYtp = ytpMood.filter(t => _purity(t, "emotional") === topPurityYtp);
+    const tailYtp = ytpMood.filter(t => _purity(t, "emotional") !== topPurityYtp);
+    ytpMood = [..._seedShuffle(headYtp, seed ^ 0x2222), ...tailYtp];
+  }
 
   // 검색형
   const searchKws = _pickKwHardFiltered(keywordScores, "search", ["mid-tail","long-tail"], sit, genre, 3);

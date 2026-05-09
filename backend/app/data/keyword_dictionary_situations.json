@@ -106,5 +106,41 @@
     "matching_moods": ["lonely", "dark", "dreamy", "chill", "cinematic"],
     "title_patterns_ko": ["새벽에 듣는 {genre}", "늦은 밤 {genre} 플레이리스트", "심야 {genre} 감성"],
     "title_patterns_en": ["late night {genre} playlist", "{genre} for the midnight hour", "3am {genre} vibes"]
+  },
+  "commute": {
+    "ko_keywords": ["출퇴근", "통근", "지하철", "버스", "출근길", "퇴근길", "지하철에서", "버스에서", "출퇴근길", "통근 음악"],
+    "en_keywords": ["commute", "subway", "bus ride", "morning commute", "evening commute", "to work", "after work", "rush hour", "transit", "commute playlist"],
+    "time_of_day": "morning_or_evening",
+    "visual_concepts": ["subway headphones", "train window scenery", "morning city street", "bus ride view", "rush hour crowd"],
+    "matching_moods": ["chill", "uplifting", "energetic", "soft"],
+    "title_patterns_ko": ["출퇴근길 듣기 좋은 {genre}", "지하철에서 듣는 {genre} 플레이리스트", "통근 {genre} 모음"],
+    "title_patterns_en": ["commute {genre} playlist", "{genre} for the subway", "morning commute {genre} mix"]
+  },
+  "cooking": {
+    "ko_keywords": ["요리", "쿠킹", "주방", "요리할 때", "쿠킹 타임", "주방 음악", "요리 BGM", "베이킹", "음식 만들 때", "요리 플레이리스트"],
+    "en_keywords": ["cooking", "kitchen music", "cooking time", "baking", "while cooking", "dinner prep", "kitchen vibes", "cooking playlist", "chef mode", "kitchen jams"],
+    "time_of_day": "any",
+    "visual_concepts": ["wooden cutting board", "steamy pot", "fresh ingredients", "warm kitchen light", "open cookbook"],
+    "matching_moods": ["chill", "happy", "soft", "peaceful"],
+    "title_patterns_ko": ["요리할 때 듣는 {genre}", "쿠킹 타임 {genre} 플레이리스트", "주방 {genre} 모음"],
+    "title_patterns_en": ["cooking {genre} playlist", "{genre} for the kitchen", "kitchen vibes {genre} mix"]
+  },
+  "reading": {
+    "ko_keywords": ["독서", "책 읽을 때", "리딩", "책과 함께", "독서 BGM", "북카페", "도서관", "조용히 읽는", "독서 시간", "책 읽는 분위기"],
+    "en_keywords": ["reading", "book reading", "study reading", "library reading", "reading playlist", "quiet reading", "book club", "reading time", "page turner", "reading vibes"],
+    "time_of_day": "any",
+    "visual_concepts": ["open book on table", "library aisle", "warm reading lamp", "book cafe corner", "quiet bookshelf"],
+    "matching_moods": ["peaceful", "chill", "soft", "dreamy"],
+    "title_patterns_ko": ["책 읽을 때 듣는 {genre}", "독서 {genre} 플레이리스트", "조용히 읽는 시간 {genre}"],
+    "title_patterns_en": ["reading {genre} playlist", "{genre} for book lovers", "quiet reading {genre} mix"]
+  },
+  "walk": {
+    "ko_keywords": ["산책", "걷기", "걸을 때", "공원 산책", "산책길", "산책 음악", "조깅", "느린 산책", "산책 BGM", "걷는 길"],
+    "en_keywords": ["walk", "walking", "stroll", "park walk", "walking playlist", "morning walk", "evening stroll", "walking vibes", "casual walk", "outdoor walk"],
+    "time_of_day": "any",
+    "visual_concepts": ["tree-lined path", "park bench", "autumn leaves", "open sky", "quiet street"],
+    "matching_moods": ["chill", "happy", "uplifting", "peaceful"],
+    "title_patterns_ko": ["산책할 때 듣는 {genre}", "걸을 때 어울리는 {genre} 플레이리스트", "산책 {genre} 모음"],
+    "title_patterns_en": ["walking {genre} playlist", "{genre} for a stroll", "park walk {genre} mix"]
   }
 }

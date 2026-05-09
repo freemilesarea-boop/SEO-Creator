@@ -941,6 +941,261 @@
         "misty blue",
         "sage green"
       ]
+    },
+    "edm": {
+      "ko_keywords": [
+        "EDM",
+        "이디엠",
+        "일렉트로닉 댄스",
+        "클럽 EDM",
+        "페스티벌 음악",
+        "빅룸",
+        "프로그레시브 하우스",
+        "퓨처 베이스",
+        "EDM 플레이리스트",
+        "댄스 EDM"
+      ],
+      "en_keywords": [
+        "edm",
+        "electronic dance music",
+        "festival edm",
+        "big room",
+        "future bass",
+        "progressive house",
+        "edm playlist",
+        "club edm",
+        "edm mix",
+        "festival anthems"
+      ],
+      "related_artists": [
+        "David Guetta",
+        "Calvin Harris",
+        "Martin Garrix",
+        "Marshmello",
+        "Tiesto",
+        "Avicii",
+        "Zedd",
+        "Diplo",
+        "Skrillex",
+        "Alesso"
+      ],
+      "related_moods": [
+        "energetic",
+        "intense",
+        "happy"
+      ],
+      "related_situations": [
+        "workout",
+        "party",
+        "night_drive"
+      ],
+      "visual_keywords": [
+        "festival crowd",
+        "laser show",
+        "led wall",
+        "stage smoke",
+        "neon dj booth"
+      ],
+      "color_tones": [
+        "electric blue",
+        "neon pink",
+        "ultraviolet",
+        "blazing white"
+      ]
+    },
+    "jpop": {
+      "ko_keywords": [
+        "제이팝",
+        "J-POP",
+        "일본 음악",
+        "일본 팝",
+        "일본 노래",
+        "제이팝 명곡",
+        "애니송",
+        "일본 시티팝",
+        "제이팝 플레이리스트",
+        "일본 발라드"
+      ],
+      "en_keywords": [
+        "jpop",
+        "j-pop",
+        "japanese pop",
+        "japanese music",
+        "anison",
+        "anime songs",
+        "jpop hits",
+        "jpop playlist",
+        "japanese hits",
+        "j-pop mix"
+      ],
+      "related_artists": [
+        "YOASOBI",
+        "Aimer",
+        "Official髭男dism",
+        "King Gnu",
+        "Yorushika",
+        "Mrs. GREEN APPLE",
+        "RADWIMPS",
+        "Vaundy",
+        "Ado",
+        "Kenshi Yonezu",
+        "LiSA",
+        "Aimyon"
+      ],
+      "related_moods": [
+        "happy",
+        "energetic",
+        "emotional",
+        "dreamy"
+      ],
+      "related_situations": [
+        "commute",
+        "walk",
+        "study",
+        "morning"
+      ],
+      "visual_keywords": [
+        "tokyo street",
+        "anime aesthetic",
+        "cherry blossom",
+        "japanese cafe",
+        "shibuya crossing"
+      ],
+      "color_tones": [
+        "soft pink",
+        "sky blue",
+        "warm cream",
+        "gentle coral"
+      ]
+    },
+    "latin": {
+      "ko_keywords": [
+        "라틴",
+        "라틴 음악",
+        "레게톤",
+        "살사",
+        "바차타",
+        "라틴 팝",
+        "라틴 댄스",
+        "라티노 음악",
+        "남미 음악",
+        "라틴 플레이리스트"
+      ],
+      "en_keywords": [
+        "latin",
+        "latin music",
+        "reggaeton",
+        "salsa",
+        "bachata",
+        "latin pop",
+        "latin dance",
+        "latino music",
+        "latin hits",
+        "latin playlist"
+      ],
+      "related_artists": [
+        "Bad Bunny",
+        "Karol G",
+        "J Balvin",
+        "Shakira",
+        "Rosalía",
+        "Maluma",
+        "Daddy Yankee",
+        "Anuel AA",
+        "Rauw Alejandro",
+        "Ozuna",
+        "Becky G",
+        "Manuel Turizo"
+      ],
+      "related_moods": [
+        "energetic",
+        "sexy",
+        "happy",
+        "intense"
+      ],
+      "related_situations": [
+        "party",
+        "workout",
+        "night_drive"
+      ],
+      "visual_keywords": [
+        "beach party",
+        "tropical sunset",
+        "dancing couple",
+        "neon nightclub",
+        "palm trees"
+      ],
+      "color_tones": [
+        "sunset orange",
+        "tropical green",
+        "hot red",
+        "deep gold"
+      ]
+    },
+    "ost": {
+      "ko_keywords": [
+        "OST",
+        "드라마 OST",
+        "영화 OST",
+        "사운드트랙",
+        "한드 OST",
+        "감성 OST",
+        "K-드라마 OST",
+        "OST 모음",
+        "영화 음악",
+        "OST 플레이리스트"
+      ],
+      "en_keywords": [
+        "ost",
+        "soundtrack",
+        "movie soundtrack",
+        "drama ost",
+        "k-drama ost",
+        "film score",
+        "cinematic music",
+        "ost mix",
+        "tv soundtrack",
+        "best ost"
+      ],
+      "related_artists": [
+        "Hans Zimmer",
+        "Joe Hisaishi",
+        "Ludovico Einaudi",
+        "Max Richter",
+        "Ramin Djawadi",
+        "John Williams",
+        "Yiruma",
+        "Park Sung Il",
+        "Gaho",
+        "Punch",
+        "Heize",
+        "Crush"
+      ],
+      "related_moods": [
+        "emotional",
+        "romantic",
+        "nostalgic",
+        "dreamy"
+      ],
+      "related_situations": [
+        "rain",
+        "late_night",
+        "breakup",
+        "sunset"
+      ],
+      "visual_keywords": [
+        "cinematic frame",
+        "rainy street",
+        "dramatic skyline",
+        "vintage film grain",
+        "lonely silhouette"
+      ],
+      "color_tones": [
+        "deep navy",
+        "muted gold",
+        "cinematic teal",
+        "warm sepia"
+      ]
     }
   },
   "moods": {
@@ -1530,6 +1785,202 @@
         "cinematic {genre} playlist",
         "epic {genre} soundtrack",
         "dramatic {genre} collection"
+      ]
+    },
+    "happy": {
+      "ko_keywords": [
+        "행복한",
+        "기분 좋은",
+        "밝은",
+        "활기찬",
+        "즐거운",
+        "흥겨운",
+        "신나는",
+        "유쾌한",
+        "쾌활한",
+        "웃음 나는"
+      ],
+      "en_keywords": [
+        "happy",
+        "cheerful",
+        "joyful",
+        "bright",
+        "feel good",
+        "uplifting",
+        "smiley",
+        "sunny",
+        "merry",
+        "good vibes"
+      ],
+      "color_tones": [
+        "sunshine yellow",
+        "warm coral",
+        "sky blue",
+        "lime green"
+      ],
+      "visual_concepts": [
+        "sunny park",
+        "smiling faces",
+        "balloons in sky",
+        "morning sunlight",
+        "open field"
+      ],
+      "title_patterns_ko": [
+        "행복한 {genre} 플레이리스트",
+        "기분 좋아지는 {genre} 모음",
+        "신나는 {genre} 듣기"
+      ],
+      "title_patterns_en": [
+        "happy {genre} playlist",
+        "feel good {genre} mix",
+        "{genre} to brighten your day"
+      ]
+    },
+    "sad": {
+      "ko_keywords": [
+        "슬픈",
+        "눈물 나는",
+        "먹먹한",
+        "이별",
+        "쓸쓸한",
+        "마음 아픈",
+        "우울한",
+        "씁쓸한",
+        "허전한",
+        "외로운 밤"
+      ],
+      "en_keywords": [
+        "sad",
+        "melancholic",
+        "tearful",
+        "heartbreak",
+        "sorrowful",
+        "blue",
+        "wistful",
+        "bittersweet",
+        "downtempo",
+        "broken"
+      ],
+      "color_tones": [
+        "faded blue",
+        "soft gray",
+        "muted violet",
+        "rainy steel"
+      ],
+      "visual_concepts": [
+        "rain on window",
+        "empty room",
+        "wilted flower",
+        "torn photograph",
+        "lonely streetlight"
+      ],
+      "title_patterns_ko": [
+        "슬픈 {genre} 플레이리스트",
+        "눈물 나는 {genre} 모음",
+        "이별 {genre} 듣기"
+      ],
+      "title_patterns_en": [
+        "sad {genre} playlist",
+        "heartbreak {genre} mix",
+        "{genre} to cry to"
+      ]
+    },
+    "peaceful": {
+      "ko_keywords": [
+        "평화로운",
+        "고요한",
+        "안정적인",
+        "잔잔한",
+        "차분한",
+        "마음을 비우는",
+        "명상적인",
+        "정적인",
+        "온화한",
+        "조용한"
+      ],
+      "en_keywords": [
+        "peaceful",
+        "calm",
+        "serene",
+        "tranquil",
+        "quiet",
+        "meditative",
+        "still",
+        "soothing",
+        "gentle calm",
+        "zen"
+      ],
+      "color_tones": [
+        "soft white",
+        "sage green",
+        "pale blue",
+        "warm cream"
+      ],
+      "visual_concepts": [
+        "misty lake",
+        "morning fog forest",
+        "open meadow",
+        "still water",
+        "soft sunrise"
+      ],
+      "title_patterns_ko": [
+        "평화로운 {genre} 플레이리스트",
+        "잔잔한 {genre} 모음",
+        "고요한 {genre} 듣기"
+      ],
+      "title_patterns_en": [
+        "peaceful {genre} playlist",
+        "calm {genre} mix",
+        "serene {genre} for relaxation"
+      ]
+    },
+    "intense": {
+      "ko_keywords": [
+        "강렬한",
+        "파워풀한",
+        "압도적인",
+        "치열한",
+        "격렬한",
+        "터지는",
+        "폭발적인",
+        "임팩트",
+        "강하고 단단한",
+        "묵직한"
+      ],
+      "en_keywords": [
+        "intense",
+        "powerful",
+        "fierce",
+        "explosive",
+        "heavy hitting",
+        "overwhelming",
+        "hard",
+        "aggressive",
+        "raw power",
+        "punchy"
+      ],
+      "color_tones": [
+        "blazing red",
+        "deep black",
+        "electric orange",
+        "steel gray"
+      ],
+      "visual_concepts": [
+        "lightning storm",
+        "bass speaker close",
+        "boxing ring",
+        "fast highway",
+        "stadium fireworks"
+      ],
+      "title_patterns_ko": [
+        "강렬한 {genre} 플레이리스트",
+        "파워풀한 {genre} 모음",
+        "터지는 {genre} 사운드"
+      ],
+      "title_patterns_en": [
+        "intense {genre} playlist",
+        "powerful {genre} mix",
+        "{genre} that hits hard"
       ]
     }
   },
@@ -2131,6 +2582,206 @@
         "late night {genre} playlist",
         "{genre} for the midnight hour",
         "3am {genre} vibes"
+      ]
+    },
+    "commute": {
+      "ko_keywords": [
+        "출퇴근",
+        "통근",
+        "지하철",
+        "버스",
+        "출근길",
+        "퇴근길",
+        "지하철에서",
+        "버스에서",
+        "출퇴근길",
+        "통근 음악"
+      ],
+      "en_keywords": [
+        "commute",
+        "subway",
+        "bus ride",
+        "morning commute",
+        "evening commute",
+        "to work",
+        "after work",
+        "rush hour",
+        "transit",
+        "commute playlist"
+      ],
+      "time_of_day": "morning_or_evening",
+      "visual_concepts": [
+        "subway headphones",
+        "train window scenery",
+        "morning city street",
+        "bus ride view",
+        "rush hour crowd"
+      ],
+      "matching_moods": [
+        "chill",
+        "uplifting",
+        "energetic",
+        "soft"
+      ],
+      "title_patterns_ko": [
+        "출퇴근길 듣기 좋은 {genre}",
+        "지하철에서 듣는 {genre} 플레이리스트",
+        "통근 {genre} 모음"
+      ],
+      "title_patterns_en": [
+        "commute {genre} playlist",
+        "{genre} for the subway",
+        "morning commute {genre} mix"
+      ]
+    },
+    "cooking": {
+      "ko_keywords": [
+        "요리",
+        "쿠킹",
+        "주방",
+        "요리할 때",
+        "쿠킹 타임",
+        "주방 음악",
+        "요리 BGM",
+        "베이킹",
+        "음식 만들 때",
+        "요리 플레이리스트"
+      ],
+      "en_keywords": [
+        "cooking",
+        "kitchen music",
+        "cooking time",
+        "baking",
+        "while cooking",
+        "dinner prep",
+        "kitchen vibes",
+        "cooking playlist",
+        "chef mode",
+        "kitchen jams"
+      ],
+      "time_of_day": "any",
+      "visual_concepts": [
+        "wooden cutting board",
+        "steamy pot",
+        "fresh ingredients",
+        "warm kitchen light",
+        "open cookbook"
+      ],
+      "matching_moods": [
+        "chill",
+        "happy",
+        "soft",
+        "peaceful"
+      ],
+      "title_patterns_ko": [
+        "요리할 때 듣는 {genre}",
+        "쿠킹 타임 {genre} 플레이리스트",
+        "주방 {genre} 모음"
+      ],
+      "title_patterns_en": [
+        "cooking {genre} playlist",
+        "{genre} for the kitchen",
+        "kitchen vibes {genre} mix"
+      ]
+    },
+    "reading": {
+      "ko_keywords": [
+        "독서",
+        "책 읽을 때",
+        "리딩",
+        "책과 함께",
+        "독서 BGM",
+        "북카페",
+        "도서관",
+        "조용히 읽는",
+        "독서 시간",
+        "책 읽는 분위기"
+      ],
+      "en_keywords": [
+        "reading",
+        "book reading",
+        "study reading",
+        "library reading",
+        "reading playlist",
+        "quiet reading",
+        "book club",
+        "reading time",
+        "page turner",
+        "reading vibes"
+      ],
+      "time_of_day": "any",
+      "visual_concepts": [
+        "open book on table",
+        "library aisle",
+        "warm reading lamp",
+        "book cafe corner",
+        "quiet bookshelf"
+      ],
+      "matching_moods": [
+        "peaceful",
+        "chill",
+        "soft",
+        "dreamy"
+      ],
+      "title_patterns_ko": [
+        "책 읽을 때 듣는 {genre}",
+        "독서 {genre} 플레이리스트",
+        "조용히 읽는 시간 {genre}"
+      ],
+      "title_patterns_en": [
+        "reading {genre} playlist",
+        "{genre} for book lovers",
+        "quiet reading {genre} mix"
+      ]
+    },
+    "walk": {
+      "ko_keywords": [
+        "산책",
+        "걷기",
+        "걸을 때",
+        "공원 산책",
+        "산책길",
+        "산책 음악",
+        "조깅",
+        "느린 산책",
+        "산책 BGM",
+        "걷는 길"
+      ],
+      "en_keywords": [
+        "walk",
+        "walking",
+        "stroll",
+        "park walk",
+        "walking playlist",
+        "morning walk",
+        "evening stroll",
+        "walking vibes",
+        "casual walk",
+        "outdoor walk"
+      ],
+      "time_of_day": "any",
+      "visual_concepts": [
+        "tree-lined path",
+        "park bench",
+        "autumn leaves",
+        "open sky",
+        "quiet street"
+      ],
+      "matching_moods": [
+        "chill",
+        "happy",
+        "uplifting",
+        "peaceful"
+      ],
+      "title_patterns_ko": [
+        "산책할 때 듣는 {genre}",
+        "걸을 때 어울리는 {genre} 플레이리스트",
+        "산책 {genre} 모음"
+      ],
+      "title_patterns_en": [
+        "walking {genre} playlist",
+        "{genre} for a stroll",
+        "park walk {genre} mix"
       ]
     }
   },

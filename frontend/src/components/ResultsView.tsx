@@ -9,11 +9,6 @@ import type { GenerationResponse } from "@/lib/api";
 import { regenerate } from "@/lib/api";
 import ResultCard from "./ResultCard";
 
-// dual-compat helper: camelCase or snake_case
-function g(obj: any, camel: string, snake: string, fallback: any = "") {
-  return obj?.[camel] ?? obj?.[snake] ?? fallback;
-}
-
 interface ResultsViewProps {
   data: GenerationResponse;
   onRegenerate: (data: GenerationResponse) => void;
@@ -28,7 +23,7 @@ export default function ResultsView({ data, onRegenerate, onToast, onError }: Re
   const handleRegenerate = async () => {
     setRegenerating(true);
     try {
-      const result = await regenerate(g(data, "generationId", "generation_id"));
+      const result = await regenerate(data.generationId);
       onRegenerate(result);
       onToast("새로운 결과가 생성되었습니다!");
     } catch (err) {
@@ -38,9 +33,9 @@ export default function ResultsView({ data, onRegenerate, onToast, onError }: Re
     }
   };
 
-  const a: any = data.analysis || {};
-  const keywordScores: any[] = g(data, "keywordScores", "keyword_scores", []);
-  const maxScore = Math.max(...keywordScores.map((k: any) => g(k, "totalScore", "total_score", 0)), 0.01);
+  const a = data.analysis;
+  const keywordScores = data.keywordScores ?? [];
+  const maxScore = Math.max(...keywordScores.map((k) => k.totalScore ?? 0), 0.01);
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -55,9 +50,9 @@ export default function ResultsView({ data, onRegenerate, onToast, onError }: Re
             <Music2 className="mt-0.5 h-4 w-4 shrink-0 text-brand-400" />
             <div>
               <p className="text-xs font-medium text-zinc-500">장르</p>
-              <p className="text-sm text-zinc-200">{g(a, "primaryGenre", "primary_genre")}</p>
-              {(g(a, "detectedGenres", "detected_genres", []) as string[]).length > 1 && (
-                <p className="mt-0.5 text-xs text-zinc-500">감지: {(g(a, "detectedGenres", "detected_genres", []) as string[]).join(", ")}</p>
+              <p className="text-sm text-zinc-200">{a.primaryGenre}</p>
+              {a.detectedGenres.length > 1 && (
+                <p className="mt-0.5 text-xs text-zinc-500">감지: {a.detectedGenres.join(", ")}</p>
               )}
             </div>
           </div>
@@ -65,14 +60,14 @@ export default function ResultsView({ data, onRegenerate, onToast, onError }: Re
             <Smile className="mt-0.5 h-4 w-4 shrink-0 text-brand-400" />
             <div>
               <p className="text-xs font-medium text-zinc-500">분위기</p>
-              <p className="text-sm text-zinc-200">{g(a, "primaryMood", "primary_mood")}</p>
+              <p className="text-sm text-zinc-200">{a.primaryMood}</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-400" />
             <div>
               <p className="text-xs font-medium text-zinc-500">상황</p>
-              <p className="text-sm text-zinc-200">{g(a, "primarySituation", "primary_situation")}</p>
+              <p className="text-sm text-zinc-200">{a.primarySituation}</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
@@ -82,22 +77,22 @@ export default function ResultsView({ data, onRegenerate, onToast, onError }: Re
               <p className="text-sm text-zinc-200">{a.language}</p>
             </div>
           </div>
-          {(g(a, "topArtists", "top_artists", []) as string[]).length > 0 && (
+          {a.topArtists.length > 0 && (
             <div className="flex items-start gap-3">
               <Users className="mt-0.5 h-4 w-4 shrink-0 text-brand-400" />
               <div>
                 <p className="text-xs font-medium text-zinc-500">주요 아티스트</p>
-                <p className="text-sm text-zinc-200">{(g(a, "topArtists", "top_artists", []) as string[]).join(", ")}</p>
+                <p className="text-sm text-zinc-200">{a.topArtists.join(", ")}</p>
               </div>
             </div>
           )}
-          {(g(a, "keywordPool", "keyword_pool", []) as string[]).length > 0 && (
+          {a.keywordPool.length > 0 && (
             <div className="flex items-start gap-3">
               <Tag className="mt-0.5 h-4 w-4 shrink-0 text-brand-400" />
               <div>
                 <p className="text-xs font-medium text-zinc-500">키워드 풀</p>
                 <div className="mt-1 flex flex-wrap gap-1">
-                  {(g(a, "keywordPool", "keyword_pool", []) as string[]).slice(0, 8).map((kw: string, i: number) => (
+                  {a.keywordPool.slice(0, 8).map((kw, i) => (
                     <span key={i} className="rounded bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">{kw}</span>
                   ))}
                 </div>
@@ -125,17 +120,17 @@ export default function ResultsView({ data, onRegenerate, onToast, onError }: Re
                 <span className="flex items-center gap-1"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-amber-500" />분위기</span>
                 <span className="flex items-center gap-1"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-emerald-500" />장르</span>
               </div>
-              {keywordScores.map((ks: any, i: number) => (
+              {keywordScores.map((ks, i) => (
                 <div key={i}>
                   <div className="mb-1 flex items-center justify-between">
                     <span className="text-sm font-medium text-zinc-300">{ks.keyword}</span>
-                    <span className="text-xs font-semibold text-zinc-400">{g(ks, "totalScore", "total_score", 0).toFixed(2)}</span>
+                    <span className="text-xs font-semibold text-zinc-400">{(ks.totalScore ?? 0).toFixed(2)}</span>
                   </div>
                   <div className="flex h-4 w-full overflow-hidden rounded-md bg-zinc-800">
-                    <div className="h-full bg-brand-500" style={{ width: `${(g(ks, "relevance", "relevance", 0) / maxScore) * 100}%` }} />
-                    <div className="h-full bg-sky-500" style={{ width: `${(g(ks, "searchIntent", "search_intent", 0) / maxScore) * 100}%` }} />
-                    <div className="h-full bg-amber-500" style={{ width: `${(g(ks, "moodMatch", "mood_match", 0) / maxScore) * 100}%` }} />
-                    <div className="h-full bg-emerald-500" style={{ width: `${(g(ks, "genreMatch", "genre_match", 0) / maxScore) * 100}%` }} />
+                    <div className="h-full bg-brand-500" style={{ width: `${((ks.relevance ?? 0) / maxScore) * 100}%` }} />
+                    <div className="h-full bg-sky-500" style={{ width: `${((ks.searchIntent ?? 0) / maxScore) * 100}%` }} />
+                    <div className="h-full bg-amber-500" style={{ width: `${((ks.moodMatch ?? 0) / maxScore) * 100}%` }} />
+                    <div className="h-full bg-emerald-500" style={{ width: `${((ks.genreMatch ?? 0) / maxScore) * 100}%` }} />
                   </div>
                 </div>
               ))}
