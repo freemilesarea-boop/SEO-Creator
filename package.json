@@ -50,14 +50,19 @@
         }
       ],
       "darkModeSupport": true,
-      "identity": null
+      "identity": null,
+      "notarize": false,
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
     },
     "dmg": {
       "title": "SEO Creator",
+      "writeUpdateInfo": false,
       "contents": [
         {
           "x": 130,
-          "y": 220
+          "y": 220,
+          "type": "file"
         },
         {
           "x": 410,
