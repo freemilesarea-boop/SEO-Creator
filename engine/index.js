@@ -14,6 +14,7 @@ const { generateThumbnail } = require("./thumbnail-generator");
 const { explainResultSet } = require("./explainer");
 const { classifyIntent } = require("./intent-classifier");
 const { parsePlaylist } = require("./playlist-parser");
+const { scoreResultSet } = require("./score-result");
 
 // ── DB (better-sqlite3 대신 간단한 JSON 파일 히스토리) ──
 const path = require("path");
@@ -96,19 +97,24 @@ function _buildResponse(analysis, language, opts = {}) {
   // 제목 3세트
   const titleSets = generateTitleSets(analysis, keywordScores, language, { seed });
 
-  // 각 세트에 썸네일 + explanation
+  // 각 세트에 썸네일 + explanation + 카드별 SEO 점수(제목 품질 기반)
   const results = titleSets.map(ts => {
     const thumb = generateThumbnail(analysis, language);
-    const avgScore = keywordScores.length > 0
-      ? keywordScores.slice(0, 5).reduce((s, k) => s + k.totalScore, 0) / Math.min(5, keywordScores.length)
-      : 0.5;
     const expl = explainResultSet(ts.ytMusicTitle, ts.ytPlaylistTitle, ts.setLabel);
+    const { seoScore, breakdown } = scoreResultSet({
+      ytMusicTitle: ts.ytMusicTitle,
+      ytPlaylistTitle: ts.ytPlaylistTitle,
+      setLabel: ts.setLabel,
+      analysis,
+      language,
+    });
     return {
       setLabel: ts.setLabel,
       ytMusicTitle: ts.ytMusicTitle,
       ytPlaylistTitle: ts.ytPlaylistTitle,
       thumbnail: thumb,
-      seoScore: +(avgScore * 100).toFixed(1),
+      seoScore,
+      scoreBreakdown: breakdown,
       explanation: expl,
     };
   });

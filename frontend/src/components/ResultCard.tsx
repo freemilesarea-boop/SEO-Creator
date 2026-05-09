@@ -19,7 +19,7 @@ import {
   Shield,
   Hash,
 } from "lucide-react";
-import type { ResultSet, TitleExplanation } from "@/lib/api";
+import type { ResultSet, TitleExplanation, ScoreBreakdownItem } from "@/lib/api";
 
 interface ResultCardProps {
   result: ResultSet;
@@ -49,6 +49,46 @@ function FragmentBadge({ type, text, reason }: { type: string; text: string; rea
       {iconMap[type]}
       <span>&quot;{text}&quot;</span>
       <span className="text-zinc-500">{reason}</span>
+    </div>
+  );
+}
+
+function ScoreBreakdownPanel({ breakdown }: { breakdown: ScoreBreakdownItem[] }) {
+  if (!breakdown || breakdown.length === 0) return null;
+  // 가중치가 큰 상위 6개만 노출 (UI 과밀 방지)
+  const items = breakdown.slice(0, 6);
+  return (
+    <div className="space-y-2">
+      <div className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">
+        점수 근거 (가중치 순)
+      </div>
+      <div className="space-y-1.5">
+        {items.map((item) => {
+          const barColor =
+            item.score >= 75
+              ? "bg-emerald-500"
+              : item.score >= 50
+                ? "bg-amber-500"
+                : "bg-red-500";
+          return (
+            <div key={item.key}>
+              <div className="mb-0.5 flex items-center justify-between text-[10px]">
+                <span className="text-zinc-400">
+                  {item.label}
+                  <span className="ml-1 text-zinc-600">×{item.weight}%</span>
+                </span>
+                <span className="font-semibold text-zinc-300">{item.score}</span>
+              </div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
+                <div
+                  className={`h-full ${barColor} transition-all duration-500`}
+                  style={{ width: `${Math.max(2, item.score)}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -143,6 +183,7 @@ export default function ResultCard({ result, index, onToast }: ResultCardProps) 
   const thumbLayout = thumb.layout ?? "";
   const textOverlay = thumb.textOverlay ?? "";
   const explanation = result.explanation || null;
+  const scoreBreakdown = result.scoreBreakdown ?? [];
 
   const scoreColor =
     seoScore >= 80
@@ -158,10 +199,11 @@ export default function ResultCard({ result, index, onToast }: ResultCardProps) 
         ? "stroke-amber-500"
         : "stroke-red-500";
 
-  const hasExplanation =
+  const hasTitleExplanation =
     explanation &&
     (explanation.ytMusicExplanation?.title ||
       explanation.ytPlaylistExplanation?.title);
+  const hasExplanation = hasTitleExplanation || scoreBreakdown.length > 0;
 
   return (
     <div
@@ -246,17 +288,27 @@ export default function ResultCard({ result, index, onToast }: ResultCardProps) 
             {showExplanation ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
           </button>
 
-          {showExplanation && explanation && (
+          {showExplanation && (
             <div className="mt-3 space-y-4 rounded-lg border border-zinc-800/80 bg-zinc-950/60 p-4 animate-fade-in">
-              <ExplanationPanel
-                explanation={explanation.ytMusicExplanation}
-                label="YT Music 제목"
-              />
-              <div className="border-t border-zinc-800/50" />
-              <ExplanationPanel
-                explanation={explanation.ytPlaylistExplanation}
-                label="YT Playlist 제목"
-              />
+              {scoreBreakdown.length > 0 && (
+                <>
+                  <ScoreBreakdownPanel breakdown={scoreBreakdown} />
+                  {hasTitleExplanation && <div className="border-t border-zinc-800/50" />}
+                </>
+              )}
+              {hasTitleExplanation && explanation && (
+                <>
+                  <ExplanationPanel
+                    explanation={explanation.ytMusicExplanation}
+                    label="YT Music 제목"
+                  />
+                  <div className="border-t border-zinc-800/50" />
+                  <ExplanationPanel
+                    explanation={explanation.ytPlaylistExplanation}
+                    label="YT Playlist 제목"
+                  />
+                </>
+              )}
             </div>
           )}
         </div>

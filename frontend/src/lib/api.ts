@@ -52,12 +52,20 @@ export interface ResultSetExplanation {
   ytPlaylistExplanation: TitleExplanation;
 }
 
+export interface ScoreBreakdownItem {
+  key: string;
+  label: string;
+  score: number; // 0~100
+  weight: number; // 0~100 (% of profile total)
+}
+
 export interface ResultSet {
   setLabel: string;
   ytMusicTitle: string;
   ytPlaylistTitle: string;
   thumbnail: ThumbnailSuggestion;
   seoScore: number;
+  scoreBreakdown?: ScoreBreakdownItem[];
   explanation?: ResultSetExplanation | null;
 }
 
