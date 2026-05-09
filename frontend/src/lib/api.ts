@@ -40,7 +40,7 @@ export interface TitleFragment {
 
 export interface TitleExplanation {
   title: string;
-  keyword_type: string;
+  keywordType: string;
   intent: string;
   competition: string;
   fragments: TitleFragment[];
@@ -48,8 +48,8 @@ export interface TitleExplanation {
 }
 
 export interface ResultSetExplanation {
-  yt_music_explanation: TitleExplanation;
-  yt_playlist_explanation: TitleExplanation;
+  ytMusicExplanation: TitleExplanation;
+  ytPlaylistExplanation: TitleExplanation;
 }
 
 export interface ResultSet {
@@ -92,8 +92,16 @@ export interface ManualInput {
 }
 
 // ── API Layer ──
-// Electron IPC 사용 (서버 없음)
-// 웹 모드 fallback (localhost:8000) 유지
+//
+// 기본 동작 모드:
+//   - Electron 환경: window.electronAPI 를 통한 IPC 호출 (백엔드 서버 불필요)
+//   - 웹 환경(브라우저 직접 접근): NEXT_PUBLIC_API_BASE 가 설정된 경우에만
+//     해당 URL로 fetch fallback. 미설정 시 명시적 에러를 던짐.
+//
+// 현재 v4 아키텍처는 Electron-only 이므로 웹 모드는 옵션 기능이다.
+// dev.sh가 띄우는 Python 백엔드(레거시)는 18484 포트를 사용하므로
+// 브라우저 모드를 직접 띄울 때는 NEXT_PUBLIC_API_BASE=http://127.0.0.1:18484
+// 와 같이 환경변수를 명시한다.
 
 declare global {
   interface Window {
@@ -101,6 +109,7 @@ declare global {
       isElectron: boolean;
       generateManual: (input: ManualInput) => Promise<{ ok: boolean; data?: GenerationResponse; error?: string }>;
       generateLink: (input: LinkInput) => Promise<{ ok: boolean; data?: GenerationResponse; error?: string }>;
+      regenerate: (generationId: string) => Promise<{ ok: boolean; data?: GenerationResponse; error?: string }>;
       getHistory: (limit?: number) => Promise<{ ok: boolean; data?: any[]; error?: string }>;
       healthCheck: () => Promise<any>;
     };
@@ -113,7 +122,7 @@ const isElectron = typeof window !== "undefined" && !!window.electronAPI?.isElec
 
 async function ipcCall<T>(method: string, input?: any): Promise<T> {
   const api = window.electronAPI!;
-  let result: any;
+  let result: { ok: boolean; data?: unknown; error?: string };
 
   switch (method) {
     case "generateManual":
@@ -121,6 +130,9 @@ async function ipcCall<T>(method: string, input?: any): Promise<T> {
       break;
     case "generateLink":
       result = await api.generateLink(input);
+      break;
+    case "regenerate":
+      result = await api.regenerate(input);
       break;
     case "getHistory":
       result = await api.getHistory(input);
@@ -135,7 +147,18 @@ async function ipcCall<T>(method: string, input?: any): Promise<T> {
 
 // ── Web fallback (fetch) ──
 
-const API_BASE = "http://localhost:8000";
+const API_BASE =
+  (typeof process !== "undefined" && process.env && process.env.NEXT_PUBLIC_API_BASE) ||
+  "";
+
+function ensureWebMode(): string {
+  if (!API_BASE) {
+    throw new Error(
+      "이 빌드는 Electron 전용입니다. 브라우저에서 사용하려면 NEXT_PUBLIC_API_BASE 환경변수에 백엔드 URL을 지정하세요 (예: http://127.0.0.1:18484)."
+    );
+  }
+  return API_BASE;
+}
 
 async function fetchCall<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, options);
@@ -151,32 +174,26 @@ async function fetchCall<T>(url: string, options?: RequestInit): Promise<T> {
 
 export async function generateFromLink(input: LinkInput): Promise<GenerationResponse> {
   if (isElectron) return ipcCall<GenerationResponse>("generateLink", input);
-  return fetchCall(`${API_BASE}/api/v1/generate/link`, {
+  return fetchCall(`${ensureWebMode()}/api/v1/generate/link`, {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(input),
   });
 }
 
 export async function generateFromManual(input: ManualInput): Promise<GenerationResponse> {
   if (isElectron) return ipcCall<GenerationResponse>("generateManual", input);
-  return fetchCall(`${API_BASE}/api/v1/generate/manual`, {
+  return fetchCall(`${ensureWebMode()}/api/v1/generate/manual`, {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(input),
   });
 }
 
 export async function regenerate(generationId: string): Promise<GenerationResponse> {
-  // regenerate는 같은 입력으로 재생성 — Electron에서는 generateManual 재호출로 대체
-  if (isElectron) {
-    // 간단하게 기본 파라미터로 재생성
-    return ipcCall<GenerationResponse>("generateManual", {
-      genre: "pop", mood: "chill", situation: "cafe", language: "ko"
-    });
-  }
-  return fetchCall(`${API_BASE}/api/v1/generate/regenerate/${generationId}`, {
+  if (isElectron) return ipcCall<GenerationResponse>("regenerate", generationId);
+  return fetchCall(`${ensureWebMode()}/api/v1/generate/regenerate/${generationId}`, {
     method: "POST", headers: { "Content-Type": "application/json" },
   });
 }
 
 export async function getHistory(): Promise<any[]> {
   if (isElectron) return ipcCall<any[]>("getHistory", 20);
-  return fetchCall(`${API_BASE}/api/v1/history`);
+  return fetchCall(`${ensureWebMode()}/api/v1/history`);
 }

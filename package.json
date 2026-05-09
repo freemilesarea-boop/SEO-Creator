@@ -13,6 +13,7 @@
     "build:app": "npm run build:frontend && electron-builder",
     "build:mac": "npm run build:frontend && electron-builder --mac",
     "build:win": "npm run build:frontend && electron-builder --win",
+    "check:dict": "node scripts/check-dictionary.js",
     "postinstall": "cd frontend && npm install --prefer-offline --no-audit"
   },
   "dependencies": {},

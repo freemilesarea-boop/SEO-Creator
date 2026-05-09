@@ -63,6 +63,11 @@ app.on("ready", () => {
     catch (e) { return { ok: false, error: e.message }; }
   });
 
+  ipcMain.handle("engine:regenerate", async (_, generationId) => {
+    try { return { ok: true, data: await engine.regenerate(generationId) }; }
+    catch (e) { return { ok: false, error: e.message }; }
+  });
+
   ipcMain.handle("engine:getHistory", (_, limit) => {
     try { return { ok: true, data: engine.getHistory(limit) }; }
     catch (e) { return { ok: false, error: e.message }; }

@@ -133,5 +133,41 @@
     "related_situations": ["sleep", "study", "rain", "morning"],
     "visual_keywords": ["misty forest", "still lake", "northern lights", "fog mountain", "ocean horizon"],
     "color_tones": ["soft white", "pale gray", "misty blue", "sage green"]
+  },
+  "edm": {
+    "ko_keywords": ["EDM", "이디엠", "일렉트로닉 댄스", "클럽 EDM", "페스티벌 음악", "빅룸", "프로그레시브 하우스", "퓨처 베이스", "EDM 플레이리스트", "댄스 EDM"],
+    "en_keywords": ["edm", "electronic dance music", "festival edm", "big room", "future bass", "progressive house", "edm playlist", "club edm", "edm mix", "festival anthems"],
+    "related_artists": ["David Guetta", "Calvin Harris", "Martin Garrix", "Marshmello", "Tiesto", "Avicii", "Zedd", "Diplo", "Skrillex", "Alesso"],
+    "related_moods": ["energetic", "intense", "happy"],
+    "related_situations": ["workout", "party", "night_drive"],
+    "visual_keywords": ["festival crowd", "laser show", "led wall", "stage smoke", "neon dj booth"],
+    "color_tones": ["electric blue", "neon pink", "ultraviolet", "blazing white"]
+  },
+  "jpop": {
+    "ko_keywords": ["제이팝", "J-POP", "일본 음악", "일본 팝", "일본 노래", "제이팝 명곡", "애니송", "일본 시티팝", "제이팝 플레이리스트", "일본 발라드"],
+    "en_keywords": ["jpop", "j-pop", "japanese pop", "japanese music", "anison", "anime songs", "jpop hits", "jpop playlist", "japanese hits", "j-pop mix"],
+    "related_artists": ["YOASOBI", "Aimer", "Official髭男dism", "King Gnu", "Yorushika", "Mrs. GREEN APPLE", "RADWIMPS", "Vaundy", "Ado", "Kenshi Yonezu", "LiSA", "Aimyon"],
+    "related_moods": ["happy", "energetic", "emotional", "dreamy"],
+    "related_situations": ["commute", "walk", "study", "morning"],
+    "visual_keywords": ["tokyo street", "anime aesthetic", "cherry blossom", "japanese cafe", "shibuya crossing"],
+    "color_tones": ["soft pink", "sky blue", "warm cream", "gentle coral"]
+  },
+  "latin": {
+    "ko_keywords": ["라틴", "라틴 음악", "레게톤", "살사", "바차타", "라틴 팝", "라틴 댄스", "라티노 음악", "남미 음악", "라틴 플레이리스트"],
+    "en_keywords": ["latin", "latin music", "reggaeton", "salsa", "bachata", "latin pop", "latin dance", "latino music", "latin hits", "latin playlist"],
+    "related_artists": ["Bad Bunny", "Karol G", "J Balvin", "Shakira", "Rosalía", "Maluma", "Daddy Yankee", "Anuel AA", "Rauw Alejandro", "Ozuna", "Becky G", "Manuel Turizo"],
+    "related_moods": ["energetic", "sexy", "happy", "intense"],
+    "related_situations": ["party", "workout", "night_drive"],
+    "visual_keywords": ["beach party", "tropical sunset", "dancing couple", "neon nightclub", "palm trees"],
+    "color_tones": ["sunset orange", "tropical green", "hot red", "deep gold"]
+  },
+  "ost": {
+    "ko_keywords": ["OST", "드라마 OST", "영화 OST", "사운드트랙", "한드 OST", "감성 OST", "K-드라마 OST", "OST 모음", "영화 음악", "OST 플레이리스트"],
+    "en_keywords": ["ost", "soundtrack", "movie soundtrack", "drama ost", "k-drama ost", "film score", "cinematic music", "ost mix", "tv soundtrack", "best ost"],
+    "related_artists": ["Hans Zimmer", "Joe Hisaishi", "Ludovico Einaudi", "Max Richter", "Ramin Djawadi", "John Williams", "Yiruma", "Park Sung Il", "Gaho", "Punch", "Heize", "Crush"],
+    "related_moods": ["emotional", "romantic", "nostalgic", "dreamy"],
+    "related_situations": ["rain", "late_night", "breakup", "sunset"],
+    "visual_keywords": ["cinematic frame", "rainy street", "dramatic skyline", "vintage film grain", "lonely silhouette"],
+    "color_tones": ["deep navy", "muted gold", "cinematic teal", "warm sepia"]
   }
 }

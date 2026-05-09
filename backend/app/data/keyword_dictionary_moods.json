@@ -94,5 +94,37 @@
     "visual_concepts": ["wide landscape shot", "dramatic clouds", "silhouette on cliff", "film reel", "spotlight in dark"],
     "title_patterns_ko": ["시네마틱 {genre} 플레이리스트", "영화 같은 {genre} 모음", "장엄한 {genre} 사운드트랙"],
     "title_patterns_en": ["cinematic {genre} playlist", "epic {genre} soundtrack", "dramatic {genre} collection"]
+  },
+  "happy": {
+    "ko_keywords": ["행복한", "기분 좋은", "밝은", "활기찬", "즐거운", "흥겨운", "신나는", "유쾌한", "쾌활한", "웃음 나는"],
+    "en_keywords": ["happy", "cheerful", "joyful", "bright", "feel good", "uplifting", "smiley", "sunny", "merry", "good vibes"],
+    "color_tones": ["sunshine yellow", "warm coral", "sky blue", "lime green"],
+    "visual_concepts": ["sunny park", "smiling faces", "balloons in sky", "morning sunlight", "open field"],
+    "title_patterns_ko": ["행복한 {genre} 플레이리스트", "기분 좋아지는 {genre} 모음", "신나는 {genre} 듣기"],
+    "title_patterns_en": ["happy {genre} playlist", "feel good {genre} mix", "{genre} to brighten your day"]
+  },
+  "sad": {
+    "ko_keywords": ["슬픈", "눈물 나는", "먹먹한", "이별", "쓸쓸한", "마음 아픈", "우울한", "씁쓸한", "허전한", "외로운 밤"],
+    "en_keywords": ["sad", "melancholic", "tearful", "heartbreak", "sorrowful", "blue", "wistful", "bittersweet", "downtempo", "broken"],
+    "color_tones": ["faded blue", "soft gray", "muted violet", "rainy steel"],
+    "visual_concepts": ["rain on window", "empty room", "wilted flower", "torn photograph", "lonely streetlight"],
+    "title_patterns_ko": ["슬픈 {genre} 플레이리스트", "눈물 나는 {genre} 모음", "이별 {genre} 듣기"],
+    "title_patterns_en": ["sad {genre} playlist", "heartbreak {genre} mix", "{genre} to cry to"]
+  },
+  "peaceful": {
+    "ko_keywords": ["평화로운", "고요한", "안정적인", "잔잔한", "차분한", "마음을 비우는", "명상적인", "정적인", "온화한", "조용한"],
+    "en_keywords": ["peaceful", "calm", "serene", "tranquil", "quiet", "meditative", "still", "soothing", "gentle calm", "zen"],
+    "color_tones": ["soft white", "sage green", "pale blue", "warm cream"],
+    "visual_concepts": ["misty lake", "morning fog forest", "open meadow", "still water", "soft sunrise"],
+    "title_patterns_ko": ["평화로운 {genre} 플레이리스트", "잔잔한 {genre} 모음", "고요한 {genre} 듣기"],
+    "title_patterns_en": ["peaceful {genre} playlist", "calm {genre} mix", "serene {genre} for relaxation"]
+  },
+  "intense": {
+    "ko_keywords": ["강렬한", "파워풀한", "압도적인", "치열한", "격렬한", "터지는", "폭발적인", "임팩트", "강하고 단단한", "묵직한"],
+    "en_keywords": ["intense", "powerful", "fierce", "explosive", "heavy hitting", "overwhelming", "hard", "aggressive", "raw power", "punchy"],
+    "color_tones": ["blazing red", "deep black", "electric orange", "steel gray"],
+    "visual_concepts": ["lightning storm", "bass speaker close", "boxing ring", "fast highway", "stadium fireworks"],
+    "title_patterns_ko": ["강렬한 {genre} 플레이리스트", "파워풀한 {genre} 모음", "터지는 {genre} 사운드"],
+    "title_patterns_en": ["intense {genre} playlist", "powerful {genre} mix", "{genre} that hits hard"]
   }
 }
