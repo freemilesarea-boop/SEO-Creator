@@ -73,25 +73,32 @@ jobs:
           rm -rf icon.iconset
           file icon.icns
 
-      - name: Build Electron app
-        run: npx electron-builder --${{ matrix.platform }} --publish never
+      # macOS: zip만 생성 (DMG는 hdiutil detach 실패 회피를 위해 완전 차단)
+      - name: Build Electron app (macOS - zip only)
+        if: matrix.platform == 'mac'
+        run: npx electron-builder --mac zip --x64 --arm64 --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # CI에서는 코드 서명/공증을 시도하지 않도록 명시 (mac arm64 runner에서 핵심)
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
+
+      - name: Build Electron app (Windows - nsis)
+        if: matrix.platform == 'win'
+        run: npx electron-builder --win nsis --x64 --publish never
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: List build output
         shell: bash
         run: ls -la dist-app/ || true
 
+      # macOS는 zip만, Windows는 exe만 업로드 (dmg/blockmap 일체 제외)
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: seo-creator-${{ matrix.platform }}
           path: |
-            dist-app/*.dmg
-            dist-app/*.exe
             dist-app/*.zip
+            dist-app/*.exe
           if-no-files-found: warn
 
   release:
